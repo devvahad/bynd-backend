@@ -1,0 +1,65 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [development, staging]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Extract branch name
+        id: branch
+        run: echo "name=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          docker build -t $ECR_REGISTRY/backend:$BRANCH .
+          docker push $ECR_REGISTRY/backend:$BRANCH
+          echo "image=$ECR_REGISTRY/backend:$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Deploy to ECS
+        env:
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          aws ecs update-service \
+            --cluster $BRANCH \
+            --task-definition backend-$BRANCH \
+            --service backend \
+            --force-new-deployment
+
+      - name: Clean up untagged ECR images
+        run: |
+          aws ecr list-images \
+            --repository-name backend \
+            --filter tagStatus=UNTAGGED \
+            --query 'imageIds[*]' \
+            --output json | \
+          jq 'if length > 0 then . else empty end' | \
+          xargs -I{} aws ecr batch-delete-image \
+            --repository-name backend \
+            --image-ids {}

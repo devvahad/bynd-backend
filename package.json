@@ -1,0 +1,51 @@
+{
+  "name": "bynd-backend",
+  "version": "1.0.0",
+  "description": "Bynd dating backend",
+  "main": "server/loader.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server/loader.js",
+    "dev": "nodemon --experimental-specifier-resolution=node server/loader.js",
+    "lint": "eslint . --ext .js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --forceExit",
+    "build": "echo 'No build step required for ESM'"
+  },
+  "keywords": [],
+  "author": "devvahad",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/lib-storage": "^3.600.0",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.12.9",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "firebase-admin": "^12.2.0",
+    "got": "^14.4.1",
+    "handlebars": "^4.7.8",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.4.1",
+    "joi": "^17.13.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.4",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.14",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
+  }
+}

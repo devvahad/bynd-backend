@@ -1,0 +1,33 @@
+const ResponseUtility = {
+  MISSING_PROPS: ({ message = 'Missing required properties.' } = {}) => ({ code: 101, message }),
+  CONN_ERR: ({ message = 'Connection Error', error } = {}) => ({ code: 102, message, error }),
+  GENERIC_ERR: ({ code = 500, message = 'Some error', error } = {}) => ({ code, message, error }),
+  NO_USER: ({ message = 'Requested user not found.' } = {}) => ({ code: 103, message }),
+  SUCCESS: ({ code = 100, message = 'Success', data } = {}) => ({ code, message, data }),
+  SUCCESS_PAGINATION: ({ code = 100, message = 'Success', data = [], page = 1, limit = 20 } = {}) => ({
+    code,
+    message,
+    data,
+    page,
+    limit,
+    size: data.length,
+    hasMore: data.length === limit,
+  }),
+  LOGIN_AUTH_FAILED: ({ message = 'Username/Password error.' } = {}) => ({ code: 104, message }),
+  NOTHING_MODIFIED: ({ message = 'Nothing modified.' } = {}) => ({ code: 105, message }),
+  INVALID_ACCESS_TOKEN: { code: 106, message: 'Invalid access token.' },
+  EMAIL_ALREADY_TAKEN: ({ message = 'This Email ID is already registered.' } = {}) => ({ code: 107, message }),
+  NUMBER_NOT_REGISTERED: ({ message = 'The requested number is not registered.' } = {}) => ({ code: 107, message }),
+  OTP_TYPE_ERROR: { code: 108, message: 'Invalid OTP type.' },
+  TOKEN_NOT_VERIFIED: { code: 109, message: 'The token could not be verified.' },
+  EMAIL_ALREADY_VERIFIED: { code: 110, message: 'Your email is already verified.' },
+  TOKEN_TRY_EXPIRED: { code: 111, message: 'Verification code try has expired. Request a new token.' },
+  TOKEN_EXPIRED: { code: 112, message: 'Your verification code has expired.' },
+  INVALID_VERIFICATION_CODE: { code: 113, message: 'Invalid URL provided for verification.' },
+  BROKEN_REFERENCE: { code: 114, message: 'Broken reference found.' },
+  MALFORMED_REQUEST: { code: 400, message: 'Malformed request. You might need to re-login.' },
+  REFRESH_TOKEN_MISMATCH: { code: 400, message: 'Refresh token mismatch.' },
+  NOT_MEMBER_OF_GROUP: { code: 116, message: 'You are not part of this group.' },
+};
+
+export default ResponseUtility;
