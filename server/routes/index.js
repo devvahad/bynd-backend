@@ -5,6 +5,8 @@ import adminRouter from './admin.js';
 import faqRouter from './faq.js';
 import notificationRouter from './notification.js';
 import appDetailRouter from './appDetail.js';
+import profileRouter from './profile.js';
+import promptRouter from './prompt.js';
 
 const router = Router();
 
@@ -14,5 +16,7 @@ router.use('/admin', adminRouter);
 router.use('/faqs', faqRouter);
 router.use('/notifications', notificationRouter);
 router.use('/app-detail', appDetailRouter);
+router.use('/profile', profileRouter);
+router.use('/prompts', promptRouter);
 
 export default router;

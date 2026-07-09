@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import ResponseUtility from '../utility/response.js';
+import { ResponseUtility } from '../utility/index.js';
 
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body, { abortEarly: false, stripUnknown: true });

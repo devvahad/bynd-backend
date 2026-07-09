@@ -5,7 +5,7 @@ import {
   ResponseUtility,
   SchemaMapperUtility,
 } from '../utility/index.js';
-import { DEFAULT_PAGE_LIMIT } from '../constants.js';
+import { PAGINATION_LIMIT } from '../constants.js';
 
 export const AdminLoginController = async (req, res) => {
   try {
@@ -28,6 +28,27 @@ export const AdminLoginController = async (req, res) => {
 export const AdminSignupController = async (req, res) => {
   try {
     const { name, email, password, isSuperAdmin } = req.body;
+    const existingAdminCount = await AdminModel.countDocuments({});
+
+    if (existingAdminCount > 0) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json(ResponseUtility.INVALID_ACCESS_TOKEN());
+      }
+      const token = authHeader.slice(7);
+      const decoded = TokenUtility.verifyTokenSafe(token);
+      if (!decoded) {
+        return res.status(401).json(ResponseUtility.INVALID_ACCESS_TOKEN());
+      }
+      if (decoded.data?.role !== 'admin') {
+        return res.status(403).json(ResponseUtility.GENERIC_ERR({ code: 403, message: 'Forbidden.' }));
+      }
+      const admin = await AdminModel.findOne({ _id: decoded.data._id || decoded.data.id }).select('isActive isDeleted');
+      if (!admin || !admin.isActive || admin.isDeleted) {
+        return res.status(401).json(ResponseUtility.INVALID_ACCESS_TOKEN());
+      }
+    }
+
     const existing = await AdminModel.findOne({ email });
     if (existing) return res.json(ResponseUtility.EMAIL_ALREADY_TAKEN());
 
@@ -44,9 +65,12 @@ export const AdminSignupController = async (req, res) => {
 export const DashboardController = async (_req, res) => {
   try {
     const [totalUsers, verifiedUsers, activeUsers] = await Promise.all([
-      UserModel.countDocuments({ isDeleted: false }),
-      UserModel.countDocuments({ isDeleted: false, isVerified: true }),
-      UserModel.countDocuments({ isDeleted: false, isActive: true }),
+      // UserModel.countDocuments({ isDeleted: false }),
+      // UserModel.countDocuments({ isDeleted: false, isVerified: true }),
+      // UserModel.countDocuments({ isDeleted: false, isActive: true }),
+      UserModel.countDocuments({ deleted: false }),
+      UserModel.countDocuments({ deleted: false, isVerified: true }),
+      UserModel.countDocuments({ deleted: false, isActive: true }),
     ]);
     return res.json(ResponseUtility.SUCCESS({ data: { totalUsers, verifiedUsers, activeUsers } }));
   } catch (err) {
@@ -57,7 +81,7 @@ export const DashboardController = async (_req, res) => {
 export const UserListController = async (req, res) => {
   try {
     const page = parseInt(req.query.page ?? '1', 10);
-    const limit = parseInt(req.query.limit ?? String(DEFAULT_PAGE_LIMIT), 10);
+    const limit = parseInt(req.query.limit ?? String(PAGINATION_LIMIT), 10);
     const skip = (page - 1) * limit;
     const search = req.query.search;
 
@@ -71,7 +95,7 @@ export const UserListController = async (req, res) => {
       .select('-password -verificationCode -passwordResetCode')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit + 1);
 
     return res.json(ResponseUtility.SUCCESS_PAGINATION({ data: users, page, limit }));
   } catch (err) {

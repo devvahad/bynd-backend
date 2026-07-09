@@ -8,3 +8,5 @@ export { default as AppleVerificationService } from './appleVerification.js';
 export { default as GoogleVerificationService } from './googleVerification.js';
 export { default as DownloadFileService } from './downloadFile.js';
 export { default as RedisClient } from './redis.js';
+export { default as AwsSNSService } from './awsSNS.js';
+export * from './tokenVersion.js';

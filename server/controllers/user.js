@@ -1,198 +1,50 @@
-import { UserModel } from '../model/index.js';
-import {
-  HashUtility,
-  TokenUtility,
-  ResponseUtility,
-  RandomCodeUtility,
-  SchemaMapperUtility,
-  TimeConversionUtility,
-} from '../utility/index.js';
-import { TemplateMailServices } from '../services/index.js';
+import * as UserModel from '../model/user/index_exports.js';
+import { ModelResolver } from './resolvers/index.js';
 
-const TOKEN_ROLE = 'user';
-
-export const SignupController = async (req, res) => {
-  try {
-    const { name, email, password, phone, deviceToken, deviceType } = req.body;
-
-    const existing = await UserModel.findOne({ email, isDeleted: false });
-    if (existing) return res.json(ResponseUtility.EMAIL_ALREADY_TAKEN());
-
-    const hashedPassword = await HashUtility.generate({ text: password });
-    const verificationCode = RandomCodeUtility(6);
-    const verificationCodeExpiry = Date.now() + TimeConversionUtility.hoursToMillis(24);
-
-    const user = await UserModel.create({
-      name,
-      email,
-      password: hashedPassword,
-      phone,
-      deviceToken,
-      deviceType,
-      verificationCode,
-      verificationCodeExpiry,
-    });
-
-    await TemplateMailServices.NewAccountMail({ to: email, name, verificationCode });
-
-    const token = TokenUtility.generateToken({ _id: user._id, email, role: TOKEN_ROLE });
-    return res.json(ResponseUtility.SUCCESS({ data: { token, user: sanitize(user) } }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
+export default {
+  signup: (req, res) => ModelResolver(req, res, UserModel.UsersSignupService),
+  verifyOTP: (req, res) => ModelResolver(req, res, UserModel.UsersVerifyOTPService),
+  resendOTP: (req, res) => ModelResolver(req, res, UserModel.UsersResendOTPService),
+  basics: (req, res) => ModelResolver(req, res, UserModel.UsersBasicsService),
+  height: (req, res) => ModelResolver(req, res, UserModel.UsersHeightService),
+  gender: (req, res) => ModelResolver(req, res, UserModel.UsersGenderService),
+  datePreferences: (req, res) => ModelResolver(req, res, UserModel.UsersDatePreferencesService),
+  religionPoliticalView: (req, res) => ModelResolver(req, res, UserModel.UsersReligionPoliticalViewService),
+  drinkSmoke: (req, res) => ModelResolver(req, res, UserModel.UsersDrinkSmokeService),
+  uploadPhotos: (req, res) => ModelResolver(req, res, UserModel.UsersUploadPhotosService),
+  firstDatePreferences: (req, res) => ModelResolver(req, res, UserModel.UsersFirstDatePreferencesService),
+  // verify: (req, res) => {
+  // 	const { query: { iphoneNumber, phoneToken } } = req;
+  // 	UserModel.UsersVerifyService({ id, emailToken })
+  // 		.then((sucess) => {
+  // 			res.set('Content-Type', 'text/html');
+  // 			res.send(sucess);
+  // 		})
+  // 		.catch(err => res.send(err));
+  // },
+  // resendVerification:
+  // (req, res) => ModelResolver(req, res, UserModel.UsersResendVerificationService),
+  login: (req, res) => ModelResolver(req, res, UserModel.UsersLoginService),
+  socialLogin: (req, res) => ModelResolver(req, res, UserModel.UsersSocialLoginService),
+  details: (req, res) => ModelResolver(req, res, UserModel.UsersDetailsService),
+  update: (req, res) => ModelResolver(req, res, UserModel.UsersUpdateService),
+  password: (req, res) => {
+    const { query: { id, tok } } = req;
+    UserModel.UsersPasswordService({ id, tok })
+      .then((success) => {
+        res.set('Content-Type', 'text/html');
+        res.send(success.data);
+      })
+      .catch(err => res.send(err));
+  },
+  forgotPassword: (req, res) => {
+    const { body: { id, passToken, password } } = req;
+    UserModel.UsersForgotPasswordService({ id, passToken, password })
+      .then((success) => {
+        res.set('Content-Type', 'text/html');
+        res.send(success.data);
+      })
+      .catch(err => res.send(err));
+  },
+  contactAdmin: (req, res) => ModelResolver(req, res, UserModel.UsersContactAdminService),
 };
-
-export const LoginController = async (req, res) => {
-  try {
-    const { email, password, deviceToken, deviceType } = req.body;
-
-    const user = await UserModel.findOne({ email, isDeleted: false });
-    if (!user) return res.json(ResponseUtility.NO_USER());
-
-    const match = await HashUtility.compare({ hash: user.password, text: password });
-    if (!match) return res.json(ResponseUtility.LOGIN_AUTH_FAILED());
-
-    if (deviceToken) {
-      await UserModel.findByIdAndUpdate(user._id, { deviceToken, deviceType });
-    }
-
-    const token = TokenUtility.generateToken({ _id: user._id, email, role: TOKEN_ROLE });
-    return res.json(ResponseUtility.SUCCESS({ data: { token, user: sanitize(user) } }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const VerifyEmailController = async (req, res) => {
-  try {
-    const { email, code } = req.params;
-    const user = await UserModel.findOne({ email, isDeleted: false });
-    if (!user) return res.json(ResponseUtility.NO_USER());
-    if (user.isVerified) return res.json(ResponseUtility.EMAIL_ALREADY_VERIFIED);
-    if (Date.now() > user.verificationCodeExpiry) return res.json(ResponseUtility.TOKEN_EXPIRED);
-    if (user.verificationCode !== Number(code)) return res.json(ResponseUtility.INVALID_VERIFICATION_CODE);
-
-    await UserModel.findByIdAndUpdate(user._id, {
-      isVerified: true,
-      verificationCode: null,
-      verificationCodeExpiry: null,
-    });
-    return res.json(ResponseUtility.SUCCESS({ message: 'Email verified successfully.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const ResendVerificationController = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await UserModel.findOne({ email, isDeleted: false });
-    if (!user) return res.json(ResponseUtility.NO_USER());
-    if (user.isVerified) return res.json(ResponseUtility.EMAIL_ALREADY_VERIFIED);
-
-    const verificationCode = RandomCodeUtility(6);
-    const verificationCodeExpiry = Date.now() + TimeConversionUtility.hoursToMillis(24);
-    await UserModel.findByIdAndUpdate(user._id, { verificationCode, verificationCodeExpiry });
-    await TemplateMailServices.VerificationToken({ to: email, name: user.name, code: verificationCode });
-
-    return res.json(ResponseUtility.SUCCESS({ message: 'Verification email resent.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const ForgotPasswordController = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await UserModel.findOne({ email, isDeleted: false });
-    if (!user) return res.json(ResponseUtility.NO_USER());
-
-    const code = RandomCodeUtility(6);
-    const expiry = Date.now() + TimeConversionUtility.hoursToMillis(1);
-    await UserModel.findByIdAndUpdate(user._id, { passwordResetCode: code, passwordResetExpiry: expiry });
-    await TemplateMailServices.ChangePasswordToken({ to: email, name: user.name, code });
-
-    return res.json(ResponseUtility.SUCCESS({ message: 'Password reset code sent to your email.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const ResetPasswordController = async (req, res) => {
-  try {
-    const { email, code, newPassword } = req.body;
-    const user = await UserModel.findOne({ email, isDeleted: false });
-    if (!user) return res.json(ResponseUtility.NO_USER());
-    if (Date.now() > user.passwordResetExpiry) return res.json(ResponseUtility.TOKEN_EXPIRED);
-    if (user.passwordResetCode !== Number(code)) return res.json(ResponseUtility.TOKEN_NOT_VERIFIED);
-
-    const password = await HashUtility.generate({ text: newPassword });
-    await UserModel.findByIdAndUpdate(user._id, {
-      password,
-      passwordResetCode: null,
-      passwordResetExpiry: null,
-    });
-    return res.json(ResponseUtility.SUCCESS({ message: 'Password reset successfully.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const UpdatePasswordController = async (req, res) => {
-  try {
-    const { oldPassword, newPassword } = req.body;
-    const user = await UserModel.findById(req.user._id);
-    if (!user) return res.json(ResponseUtility.NO_USER());
-
-    const match = await HashUtility.compare({ hash: user.password, text: oldPassword });
-    if (!match) return res.json(ResponseUtility.LOGIN_AUTH_FAILED({ message: 'Current password is incorrect.' }));
-
-    const password = await HashUtility.generate({ text: newPassword });
-    await UserModel.findByIdAndUpdate(user._id, { password });
-    return res.json(ResponseUtility.SUCCESS({ message: 'Password updated.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const UserDetailsController = async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.user._id).select('-password -verificationCode -passwordResetCode');
-    if (!user) return res.json(ResponseUtility.NO_USER());
-    return res.json(ResponseUtility.SUCCESS({ data: user }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const UpdateUserController = async (req, res) => {
-  try {
-    const updates = await SchemaMapperUtility(req.body);
-    const user = await UserModel.findByIdAndUpdate(req.user._id, updates, { new: true })
-      .select('-password -verificationCode -passwordResetCode');
-    return res.json(ResponseUtility.SUCCESS({ data: user }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-export const ContactAdminController = async (req, res) => {
-  try {
-    const { subject, message } = req.body;
-    const user = await UserModel.findById(req.user._id);
-    return res.json(ResponseUtility.SUCCESS({ message: 'Your message has been sent.' }));
-  } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
-  }
-};
-
-const sanitize = (user) => ({
-  _id: user._id,
-  name: user.name,
-  email: user.email,
-  phone: user.phone,
-  isVerified: user.isVerified,
-  profilePicture: user.profilePicture,
-  role: user.role,
-  createdAt: user.createdAt,
-});

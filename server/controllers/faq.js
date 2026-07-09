@@ -1,6 +1,6 @@
 import { FaqModel } from '../model/index.js';
 import { ResponseUtility, SchemaMapperUtility } from '../utility/index.js';
-import { DEFAULT_PAGE_LIMIT } from '../constants.js';
+import { PAGINATION_LIMIT } from '../constants.js';
 
 export const AddFaqController = async (req, res) => {
   try {
@@ -14,11 +14,11 @@ export const AddFaqController = async (req, res) => {
 export const ListFaqController = async (req, res) => {
   try {
     const page = parseInt(req.query.page ?? '1', 10);
-    const limit = parseInt(req.query.limit ?? String(DEFAULT_PAGE_LIMIT), 10);
+    const limit = parseInt(req.query.limit ?? String(PAGINATION_LIMIT), 10);
     const faqs = await FaqModel.find({ isDeleted: false, isActive: true })
       .sort({ order: 1, createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit + 1);
     return res.json(ResponseUtility.SUCCESS_PAGINATION({ data: faqs, page, limit }));
   } catch (err) {
     return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));

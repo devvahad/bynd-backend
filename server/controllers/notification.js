@@ -1,7 +1,7 @@
 import { NotificationModel, UserModel } from '../model/index.js';
 import { ResponseUtility } from '../utility/index.js';
 import { FirebaseNotificationService } from '../services/index.js';
-import { DEFAULT_PAGE_LIMIT } from '../constants.js';
+import { PAGINATION_LIMIT } from '../constants.js';
 
 export const BroadcastNotificationController = async (req, res) => {
   try {
@@ -42,7 +42,7 @@ export const BroadcastNotificationController = async (req, res) => {
 export const ListNotificationsController = async (req, res) => {
   try {
     const page = parseInt(req.query.page ?? '1', 10);
-    const limit = parseInt(req.query.limit ?? String(DEFAULT_PAGE_LIMIT), 10);
+    const limit = parseInt(req.query.limit ?? String(PAGINATION_LIMIT), 10);
 
     const notifications = await NotificationModel.find({
       $or: [{ userId: req.user._id }, { isBroadcast: true }],
@@ -50,7 +50,7 @@ export const ListNotificationsController = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit + 1);
 
     return res.json(ResponseUtility.SUCCESS_PAGINATION({ data: notifications, page, limit }));
   } catch (err) {

@@ -1,20 +1,49 @@
-const PropsValidationUtility = ({ validProps, sourceDocument }) =>
-  new Promise((resolve, reject) => {
-    if (!validProps || !sourceDocument) {
-      return reject({ code: 101, message: 'validProps and sourceDocument are required.' });
-    }
+import { SUCCESS_CODE, MISSING_PROPS_CODE, INVALID_INPUT_CODE } from '../constants.js';
 
-    const missing = validProps.filter((p) => sourceDocument[p] === undefined);
+const isMissing = (value) =>
+  value === undefined ||
+  value === null ||
+  value === '' ||
+  (Array.isArray(value) && value.length === 0);
 
-    if (!missing.length) {
-      return resolve({ code: 100, message: 'Validated' });
-    }
+const formatList = (items) => {
+  if (items.length === 1) return items[0];
+  return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+};
 
-    const joined = missing.length === 1
-      ? missing[0]
-      : `${missing.slice(0, -1).join(', ')} and ${missing.at(-1)}`;
+const PropsValidationUtility = ({ validProps = [], sourceDocument = {} } = {}) => {
+  if (!Array.isArray(validProps)) {
+    return {
+      code: INVALID_INPUT_CODE,
+      message: 'validProps must be an array of property names.',
+      error: 'Invalid Input',
+    };
+  }
 
-    return resolve({ code: 102, message: `Missing required ${missing.length > 1 ? 'properties' : 'property'}: ${joined}` });
-  });
+  if (typeof sourceDocument !== 'object' || sourceDocument === null || Array.isArray(sourceDocument)) {
+    return {
+      code: INVALID_INPUT_CODE,
+      message: 'sourceDocument must be a plain object.',
+      error: 'Invalid Input',
+    };
+  }
+
+  const missing = validProps.filter((prop) => isMissing(sourceDocument[prop]));
+
+  if (missing.length > 0) {
+    const label = missing.length > 1 ? 'properties' : 'property';
+    return {
+      code: MISSING_PROPS_CODE,
+      message: `Missing required ${label}: ${formatList(missing)}.`,
+      error: 'Missing Props',
+      missingProps: missing,
+    };
+  }
+
+  return {
+    code: SUCCESS_CODE,
+    message: 'All properties are valid.',
+  };
+};
 
 export default PropsValidationUtility;

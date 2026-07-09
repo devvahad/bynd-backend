@@ -2,7 +2,9 @@ Dockerfile
 node_modules
 .github
 .vscode
+.circleci
 *.log
 .gitignore
 .env
 logs/
+deploy-build.sh
