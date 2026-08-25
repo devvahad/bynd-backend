@@ -25,3 +25,39 @@ export const EditUserSchema = validate(
     name: Joi.string().trim().optional(),
   }),
 );
+
+const objectId = Joi.string().trim().length(24).hex();
+
+export const AdminUserDetailsSchema = validate(
+  Joi.object({ userId: objectId.required() }),
+);
+
+export const AdminBlockUserSchema = validate(
+  Joi.object({ userId: objectId.required(), action: Joi.string().valid('block', 'unblock').required() }),
+);
+
+export const AdminDeleteUserSchema = validate(
+  Joi.object({ userId: objectId.required() }),
+);
+
+export const AdminGetVerificationDetailsSchema = validate(
+  Joi.object({ userId: objectId.required() }),
+);
+
+export const AdminReviewVerificationSchema = validate(
+  Joi.object({ userId: objectId.required(), action: Joi.string().valid('approve', 'reject').required() }),
+);
+
+export const AdminReportsSchema = validate(
+  Joi.object({
+    page: Joi.number().integer().min(1).optional(),
+    limit: Joi.number().integer().min(1).max(100).optional(),
+    search: Joi.string().trim().allow('').optional(),
+    status: Joi.string().valid('pending', 'reviewed', '').optional(),
+    source: Joi.string().valid('PROFILE', 'CHAT', '').optional(),
+  }),
+);
+
+export const AdminReviewReportSchema = validate(
+  Joi.object({ reportId: objectId.required() }),
+);

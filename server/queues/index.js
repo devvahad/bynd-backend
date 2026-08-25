@@ -16,4 +16,5 @@ export const getQueue = (name) => {
 export const QUEUES = Object.freeze({
   EMAIL: 'email',
   NOTIFICATION: 'notification',
+  CRON: 'cron',
 });

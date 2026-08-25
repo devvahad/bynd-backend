@@ -67,6 +67,10 @@ export const TYPE_OF_NOTIFICATIONS = {
   MESSAGE: 2,
   DATE_REQUEST: 3,
   MATCH: 4,
+  NEW_ADMIRER: 5,
+  DATE_REMINDER: 6,
+  MATCH_EXPIRING: 7,
+  DATE_REQUEST_EXPIRING: 8,
 };
 
 export const ADMIN_USER_ACTIONS = {
@@ -485,3 +489,76 @@ export const APPLE_KEYS_URL =
 
 export const APPLE_ISSUER =
   'https://appleid.apple.com';
+
+// ---- Likes / Passes ----
+export const FREE_USER_LIKE_LIMIT = 10;
+export const PREMIUM_USER_LIKE_LIMIT = null;
+export const LIKE_COUNTER_PREFIX = 'like_counter:';
+export const LIKE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60;
+export const UNDO_PASS_REDIS_PREFIX = 'undo_pass:';
+
+// ---- Matches / Date Requests ----
+export const PLAN_DATE_EXPIRY_HOURS = 72;
+export const MATCH_STATUS = Object.freeze({
+  ACTIVE: 'active',
+  EXPIRED: 'expired',
+  DATE_PLANNED: 'date_planned',
+  UNMATCHED: 'unmatched',
+});
+export const DATE_REQUEST_STATUS = Object.freeze({
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  CANCELLED: 'cancelled',
+  COMPLETED: 'completed',
+  SUPERSEDED: 'superseded',
+});
+
+export const USER_SEGMENT = Object.freeze({ LOW: 'low', MEDIUM: 'medium', HIGH: 'high' });
+export const MISSED_MATCH_FREQUENCY = Object.freeze({ LOW: 1, MEDIUM: 3, HIGH: 5 });
+export const MISSED_MATCH_DAILY_CAP = Object.freeze({ LOW: 6, MEDIUM: 5, HIGH: 3 });
+export const INBOUND_LIKES_THRESHOLD = Object.freeze({ LOW: 10, MEDIUM: 50, HIGH: 50 });
+export const MIN_SWIPES_BEFORE_POPUP = 5;
+
+export const OPEN_TO_EVERYONE = "I'm open to dating everyone";
+export const EDUCATION_LEVELS = [
+  'High school', 'In college', 'Associate degree', 'Trade/tech school',
+  "Bachelor's degree", 'In grad school', 'Graduate degree', 'In doctorate program', 'Doctorate',
+];
+
+export const DATE_FEEDBACK_RATINGS = ['Very bad', 'Bad', 'Neutral', 'Good', 'Very good'];
+
+export const SUBSCRIPTION_TYPE = Object.freeze({
+  ONE_WEEK: 1, ONE_MONTH: 2, THREE_MONTH: 3, SIX_MONTH: 4,
+});
+export const SUBSCRIPTION_RATE = Object.freeze({
+  ONE_WEEK_RATE: 11.99, ONE_MONTH_RATE: 24.99, THREE_MONTH_RATE: 49.99, SIX_MONTH_RATE: 69.99,
+});
+
+export const REPORT_CATEGORIES = [
+  {
+    category: 'Profile is fake, scammer, or spam',
+    subOptions: [
+      'Using my photos', 'Using someone else\u2019s photos', 'Using AI-generated photos',
+      'Photos don\u2019t feature a person', 'Face is obscured or covered in photos',
+      'Selling products or services', 'Feels like spam',
+    ],
+  },
+  {
+    category: 'Harassment, abuse, or hateful behavior',
+    subOptions: [
+      'Harassed me on another platform', 'Unsolicited sexually explicit content',
+      'Threats of violence', 'Physical or sexual violence', 'Stalking',
+      'Endangering minors', 'Identity-based hate',
+    ],
+  },
+  {
+    category: 'Inappropriate content',
+    subOptions: ['Inappropriate bio', 'Inappropriate prompts', 'Inappropriate photos'],
+  },
+  {
+    category: 'Underage',
+    subOptions: ['Profile of person says they are under 18', 'I know this person; they are under 18'],
+  },
+  { category: "I'm just not interested in this person", subOptions: [] },
+];

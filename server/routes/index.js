@@ -7,6 +7,15 @@ import notificationRouter from './notification.js';
 import appDetailRouter from './appDetail.js';
 import profileRouter from './profile.js';
 import promptRouter from './prompt.js';
+import blockedContactsRouter from './blockedContacts.js';
+import likesRouter from './likes.js';
+import matchesRouter from './matches.js';
+import filterRouter from './filter.js';
+import peopleRouter from './people.js';
+import chatRouter from './chat.js';
+import missedMatchRouter from './missedMatch.js';
+import subscriptionRouter from './subscription.js';
+import dateRouter from './date.js';
 
 const router = Router();
 
@@ -18,5 +27,14 @@ router.use('/notifications', notificationRouter);
 router.use('/app-detail', appDetailRouter);
 router.use('/profile', profileRouter);
 router.use('/prompts', promptRouter);
+router.use('/blocked-contacts', blockedContactsRouter);
+router.use('/people', likesRouter);
+router.use('/matches', matchesRouter);
+router.use('/filters', filterRouter);
+router.use('/people-feed', peopleRouter);
+router.use('/chat', chatRouter);
+router.use('/missed-match', missedMatchRouter);
+router.use('/subscription', subscriptionRouter);
+router.use('/dates', dateRouter);
 
 export default router;

@@ -134,6 +134,43 @@ const UserSchema = new Schema(
 
     profileProgress: { type: Number, default: 0 },
     isPremium: { type: Boolean, default: false },
+    subscriptionExpired: { type: Boolean, default: false },
+    incognitoMode: { type: Boolean, default: false },
+    matchScore: { type: Number, default: 0 },
+    isOnboardingCompleted: { type: Boolean, default: false },
+
+    verifiedByAdmin: { type: Boolean, default: false },
+    verificationImage: {
+      url: { type: String },
+      uploadedAt: { type: Date },
+      status: { type: String, enum: ['pending', 'approved', 'rejected'] },
+      actionType: { type: String, enum: ['thumbs_up', 'victory_sign', 'open_hand'] },
+    },
+    verificationAttempts: { type: Number, default: 0 },
+    verificationReviewedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'Admin',
+      default: null,
+    },
+    verificationReviewedAt: { type: Date, default: null },
+
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: null },
+    timezone: { type: String, default: 'UTC' },
+    lastBulkLikeNotificationSentAt: { type: Date, default: null },
+
+    sessionSwipeCount: { type: Number, default: 0 },
+    missedMatchCount: { type: Number, default: 0 },
+    userSegment: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+    dailyMissedMatchShown: { type: Number, default: 0 },
+    lastMissedMatchReset: { type: Date, default: Date.now },
+    inboundLikesLast7Days: { type: Number, default: 0 },
+    lastInboundLikesUpdate: { type: Date, default: Date.now },
+
+    reportedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
+    reportedBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
+    removedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
+    removedBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
 
     googleId: { type: String, sparse: true },
     appleId: { type: String, sparse: true },
@@ -155,6 +192,7 @@ const UserSchema = new Schema(
     createdOn: { type: Date },
     updatedOn: { type: Date },
     deletedOn: { type: Date },
+    deleteReason: { type: String, default: null },
     lastUpdatedAt: { type: Date },
   },
   { timestamps: true },

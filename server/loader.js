@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import app from './server.js';
 import { LogServices } from './services/index.js';
+import { StartSocket } from './services/socket.js';
+import { registerProcessors } from './queues/processes/index.js';
+import { initializeCronJobs, shutdownCronJobs } from './utility/crons/scheduler.js';
 import {
   DEFAULT_PORT,
   SHUTDOWN_TIMEOUT_MS,
@@ -26,6 +29,16 @@ let isShuttingDown = false;
 
 const server = app.listen(PORT, () => {
   log(`Server running on port ${PORT} (${NODE_ENV})`);
+});
+
+StartSocket(server).catch((error) => {
+  logError('Failed to start Socket.IO', error);
+});
+
+registerProcessors();
+
+initializeCronJobs().catch((error) => {
+  logError('Failed to initialize cron jobs', error);
 });
 
 server.on('error', (error) => {
@@ -57,7 +70,7 @@ const shutdown = (signal, exitCode = 0) => {
       return;
     }
     log('HTTP server closed.');
-    process.exit(exitCode);
+    shutdownCronJobs().finally(() => process.exit(exitCode));
   });
 };
 

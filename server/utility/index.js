@@ -7,3 +7,4 @@ export { default as TimeConversionUtility } from './time.js';
 export { default as TokenUtility } from './token.js';
 export { default as LimiterUtility } from './limiter.js';
 export { default as ImageUploadUtility } from './imageUpload.js';
+export { default as DistanceUtility } from './distance.js';
