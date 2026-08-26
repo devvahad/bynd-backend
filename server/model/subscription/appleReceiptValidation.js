@@ -3,11 +3,6 @@ import { logger } from '../../services/logger.js';
 const PRODUCTION_URL = 'https://buy.itunes.apple.com/verifyReceipt';
 const SANDBOX_URL = 'https://sandbox.itunes.apple.com/verifyReceipt';
 
-/**
- * Validate an iOS receipt against Apple's verifyReceipt endpoint,
- * automatically retrying against the sandbox environment when Apple
- * reports the receipt is a sandbox receipt (status 21007).
- */
 const validateiOSReceipt = async (receiptData, password) => {
   const cleanedReceipt = receiptData.replace(/[\s\n\r\t]/g, '');
 
@@ -49,10 +44,6 @@ const validateiOSReceipt = async (receiptData, password) => {
   return validationData;
 };
 
-/**
- * Extract the most recent transaction for a given product from an
- * Apple verifyReceipt response.
- */
 export const extractiOSTransactionDetails = (validationResponse, productId) => {
   const receiptInfo = validationResponse.latest_receipt_info || validationResponse.receipt?.in_app || [];
 

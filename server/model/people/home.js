@@ -11,7 +11,6 @@ import {
   MIN_HEIGHT_CM, MAX_HEIGHT_CM, MATCH_STATUS, OPEN_TO_EVERYONE,
 } from '../../constants.js';
 
-/** Fisher-Yates shuffle. */
 const shuffleArray = (array) => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i -= 1) {
@@ -21,7 +20,6 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
-/** Duplicate premium users so they're shown ~2x more often in the deck. */
 const applyPremiumBoost = (premiumUsers) => [...premiumUsers, ...premiumUsers];
 
 const buildFilterQuery = (baseQuery, filters, loggedInUser) => {
@@ -76,6 +74,7 @@ const buildFilterQuery = (baseQuery, filters, loggedInUser) => {
   applyInFilter(advanced.education, 'education');
   applyInFilter(advanced.exercise, 'exercise');
   applyInFilter(advanced.relationshipType, 'relationshipType');
+  applyInFilter(advanced.cannabis, 'cannabis');
   applyInFilter(advanced.languages, 'languages');
 
   return query;
@@ -128,13 +127,6 @@ const formatProfile = (user) => ({
   updatedOn: user.updatedOn,
 });
 
-/**
- * Fetch the swipe-deck feed for the home/people page.
- * NOTE: Backend A gated this behind `isOnboardingCompleted: true`, a flag set
- * only at the very end of its onboarding flow. Backend B's onboarding flow
- * differs, so this is relaxed to "has a first name and at least one photo" —
- * revisit once B's onboarding-completion tracking is finalized.
- */
 export default async ({
   id, page = 1, limit = 10, lat, lng,
 }) => {

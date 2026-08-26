@@ -4,11 +4,9 @@ const { Schema, model } = mongoose;
 
 const MissedMatchSchema = new Schema(
   {
-    // User who passed.
     userRef: {
       type: Schema.Types.ObjectId, ref: 'User', required: true, index: true,
     },
-    // User who was passed, but had already liked userRef first.
     missedUserRef: {
       type: Schema.Types.ObjectId, ref: 'User', required: true, index: true,
     },

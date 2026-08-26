@@ -12,6 +12,8 @@ const AdminSchema = new Schema(
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
     lastLogin: { type: Date },
+    passwordResetCode: { type: String, default: null },
+    passwordResetExpiry: { type: Number, default: null },
   },
   { timestamps: true },
 );

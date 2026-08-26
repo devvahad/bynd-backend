@@ -66,6 +66,28 @@ const monthName = (month) => {
   return MONTHS[month];
 };
 
+const formatInTimezone = (date, timezone, options) => {
+  try {
+    return new Intl.DateTimeFormat('en-US', { timeZone: timezone, ...options }).format(date);
+  } catch {
+    return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...options }).format(date);
+  }
+};
+
+const formatLongDateInTimezone = (date, timezone) => formatInTimezone(date, timezone, {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+});
+
+const formatShortDateInTimezone = (date, timezone) => formatInTimezone(date, timezone, {
+  month: 'numeric', day: 'numeric', year: 'numeric',
+});
+
+const formatTimeInTimezone = (date, timezone) => formatInTimezone(date, timezone, {
+  hour: '2-digit', minute: '2-digit', hour12: true,
+});
+
+const formatLongDateTimeInTimezone = (date, timezone) => `${formatLongDateInTimezone(date, timezone)}, ${formatTimeInTimezone(date, timezone)}`;
+
 const TimeConversionUtility = Object.freeze({
   minutesToMillis,
   hoursToMillis,
@@ -76,6 +98,10 @@ const TimeConversionUtility = Object.freeze({
   formatTimestamp,
   formatTimestampISO,
   monthName,
+  formatLongDateInTimezone,
+  formatShortDateInTimezone,
+  formatTimeInTimezone,
+  formatLongDateTimeInTimezone,
 });
 
 export default TimeConversionUtility;
@@ -89,4 +115,8 @@ export {
   formatTimestamp,
   formatTimestampISO,
   monthName,
+  formatLongDateInTimezone,
+  formatShortDateInTimezone,
+  formatTimeInTimezone,
+  formatLongDateTimeInTimezone,
 };

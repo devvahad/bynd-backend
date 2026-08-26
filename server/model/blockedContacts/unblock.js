@@ -3,10 +3,6 @@ import { UserModel } from '../index.js';
 import { BlockedContactModel } from './schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 
-/**
- * Unblock a previously blocked contact so the user can appear again
- * in swipe decks / people listings.
- */
 export default async ({ id, blockedContactId }) => {
   if (!id || !blockedContactId) {
     throw ResponseUtility.MISSING_PROPS({ message: 'Missing property blockedContactId.' });

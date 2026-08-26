@@ -2,7 +2,7 @@ import { redis } from './redis.js';
 import { logger } from './logger.js';
 
 const TOKEN_VERSION_PREFIX = 'tv:';
-const TOKEN_VERSION_TTL = 7 * 24 * 60 * 60; // 7d — matches JWT_EXPIRES_IN
+const TOKEN_VERSION_TTL = 7 * 24 * 60 * 60;
 
 const key = (userId) => `${TOKEN_VERSION_PREFIX}${userId}`;
 

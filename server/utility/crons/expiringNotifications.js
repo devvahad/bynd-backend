@@ -6,7 +6,6 @@ import {
   MATCH_STATUS, DATE_REQUEST_STATUS, TYPE_OF_NOTIFICATIONS, PLAN_DATE_EXPIRY_HOURS,
 } from '../../constants.js';
 
-/** Warn both sides of an about-to-expire match (no date planned yet). */
 export const sendExpiringMatchNotifications = async () => {
   try {
     const now = Date.now();
@@ -34,7 +33,6 @@ export const sendExpiringMatchNotifications = async () => {
 
       for (const user of users) {
         try {
-          // eslint-disable-next-line no-await-in-loop
           await UnifiedNotificationService({
             userId: user.id,
             title: 'Match Expiring Soon',
@@ -49,7 +47,6 @@ export const sendExpiringMatchNotifications = async () => {
         }
       }
 
-      // eslint-disable-next-line no-await-in-loop
       await MatchModel.updateOne({ _id: match._id }, { $addToSet: { expiryRemindersSent: '8h' } });
     }
 
@@ -60,7 +57,6 @@ export const sendExpiringMatchNotifications = async () => {
   }
 };
 
-/** Warn the receiver before a pending date request's parent match expires. */
 export const sendExpiringDateRequestNotifications = async () => {
   try {
     const now = Date.now();
@@ -73,7 +69,6 @@ export const sendExpiringDateRequestNotifications = async () => {
     let notificationsSent = 0;
 
     for (const request of requests) {
-      // eslint-disable-next-line no-await-in-loop
       const match = await MatchModel.findOne({ _id: request.matchRef, status: MATCH_STATUS.ACTIVE, deleted: false });
       if (!match || !request.senderRef || !request.receiverRef) continue;
 
@@ -91,7 +86,6 @@ export const sendExpiringDateRequestNotifications = async () => {
       if (!reminderType || request.expiryRemindersSent?.includes(reminderType)) continue;
 
       try {
-        // eslint-disable-next-line no-await-in-loop
         await UnifiedNotificationService({
           userId: request.receiverRef._id,
           title: 'Date Request Expiring',
@@ -106,8 +100,6 @@ export const sendExpiringDateRequestNotifications = async () => {
       } catch (notifErr) {
         logger.error(`Failed to send expiring date request notification: ${notifErr.message}`);
       }
-
-      // eslint-disable-next-line no-await-in-loop
       await DateRequestModel.updateOne({ _id: request._id }, { $addToSet: { expiryRemindersSent: reminderType } });
     }
 

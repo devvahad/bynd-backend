@@ -55,9 +55,31 @@ export const AdminReportsSchema = validate(
     search: Joi.string().trim().allow('').optional(),
     status: Joi.string().valid('pending', 'reviewed', '').optional(),
     source: Joi.string().valid('PROFILE', 'CHAT', '').optional(),
+    category: Joi.string().trim().allow('').optional(),
+    subOption: Joi.string().trim().allow('').optional(),
   }),
 );
 
 export const AdminReviewReportSchema = validate(
   Joi.object({ reportId: objectId.required() }),
+);
+
+export const AdminSendForgotPasswordEmailSchema = validate(
+  Joi.object({ email: Joi.string().email().required() }),
+);
+
+export const AdminResetPasswordSchema = validate(
+  Joi.object({
+    email: Joi.string().email().required(),
+    code: Joi.string().trim().required(),
+    newPassword: Joi.string().min(8).max(64).required(),
+  }),
+);
+
+export const NoShowUsersListSchema = validate(
+  Joi.object({
+    page: Joi.number().integer().min(1).optional(),
+    limit: Joi.number().integer().min(1).max(100).optional(),
+    search: Joi.string().trim().allow('').optional(),
+  }),
 );

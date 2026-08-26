@@ -86,9 +86,13 @@ export const StartSocket = async (server) => {
       );
 
       for (const msg of undelivered) {
-        socket.emit('receive-message', msg);
+        try {
+          await socket.timeout(5000).emitWithAck('receive-message', msg);
+        } catch {
+          logger.warn(`Undelivered-message replay not acknowledged for message ${msg._id}`);
+          break;
+        }
         const now = new Date();
-        // eslint-disable-next-line no-await-in-loop
         await MessageModel.findByIdAndUpdate(msg._id, { $set: { deliveredAt: now } });
         io.to(msg.from.toString()).emit('message-status', { messageId: msg._id, status: 'delivered', deliveredAt: now });
       }
@@ -206,7 +210,7 @@ export const StartSocket = async (server) => {
             type: TYPE_OF_NOTIFICATIONS.MESSAGE,
             reference: newMessage._id.toString(),
             payload: { event: 'NEW_MESSAGE', sourceRef: userId },
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         const updates = {};

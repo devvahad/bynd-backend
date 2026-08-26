@@ -1,9 +1,3 @@
-/**
- * Calculate distance between two geo points (Haversine formula).
- * @param {Array<number>} coords1 [longitude, latitude]
- * @param {Array<number>} coords2 [longitude, latitude]
- * @returns {number|null} distance in miles (1 decimal) or null
- */
 const calculateDistance = (coords1, coords2) => {
   if (
     !Array.isArray(coords1) || !Array.isArray(coords2)
@@ -22,7 +16,7 @@ const calculateDistance = (coords1, coords2) => {
     return null;
   }
 
-  const R = 6371; // Earth radius in km
+  const R = 6371;
 
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;

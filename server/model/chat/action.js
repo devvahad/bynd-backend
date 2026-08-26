@@ -3,8 +3,32 @@ import { UserModel } from '../index.js';
 import BlockUserModel from './blockUserSchema.js';
 import ReportModel from './reportSchema.js';
 import MatchModel from '../matches/schema.js';
+import DateRequestModel from '../matches/dateRequestSchema.js';
+import LikeModel from '../like/schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 import { USER_CHAT_ACTION, MATCH_STATUS } from '../../constants.js';
+
+const clearLikesBetween = (userA, userB) => LikeModel.updateMany(
+  {
+    deleted: false,
+    $or: [
+      { userRef: userA, likedUserRef: userB },
+      { userRef: userB, likedUserRef: userA },
+    ],
+  },
+  { $set: { deleted: true } },
+);
+
+const clearDateRequestsBetween = (userA, userB) => DateRequestModel.updateMany(
+  {
+    deleted: false,
+    $or: [
+      { senderRef: userA, receiverRef: userB },
+      { senderRef: userB, receiverRef: userA },
+    ],
+  },
+  { $set: { deleted: true } },
+);
 
 export default async ({
   id, userRef, action, comment,
@@ -38,6 +62,8 @@ export default async ({
 
     await BlockUserModel.create({ userRef, blockedBy: id });
 
+    await Promise.all([clearLikesBetween(id, userRef), clearDateRequestsBetween(id, userRef)]);
+
     return ResponseUtility.SUCCESS({ message: 'User has been blocked' });
   }
 
@@ -54,6 +80,8 @@ export default async ({
         },
       },
     );
+
+    await Promise.all([clearLikesBetween(id, userRef), clearDateRequestsBetween(id, userRef)]);
 
     return ResponseUtility.SUCCESS({ message: 'User has been removed from match' });
   }
@@ -87,6 +115,8 @@ export default async ({
     await Promise.all([
       UserModel.findByIdAndUpdate(id, { $addToSet: { reportedUsers: userRef } }),
       UserModel.findByIdAndUpdate(userRef, { $addToSet: { reportedBy: id } }),
+      clearLikesBetween(id, userRef),
+      clearDateRequestsBetween(id, userRef),
     ]);
 
     return ResponseUtility.SUCCESS({ message: 'Report submitted successfully.' });

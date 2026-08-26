@@ -6,16 +6,28 @@ import MessageModel from '../chat/messageSchema.js';
 import BlockUserModel from '../chat/blockUserSchema.js';
 import DateFeedbackModel from '../date/schema.js';
 import { ResponseUtility } from '../../utility/index.js';
-import { DATE_REQUEST_STATUS } from '../../constants.js';
+import { DATE_REQUEST_STATUS, MATCH_STATUS } from '../../constants.js';
 
 export default async ({ userId, page = 1, limit = 10 }) => {
   const currentTime = new Date();
 
   const loggedUser = await UserModel.findById(userId).select('reportedUsers reportedBy');
 
+  const CHAT_WINDOW_HOURS = 24;
+  const completedVisibleAfter = new Date(
+    currentTime.getTime() - CHAT_WINDOW_HOURS * 60 * 60 * 1000
+  );
+
   const query = {
     $or: [{ senderRef: userId }, { receiverRef: userId }],
-    status: DATE_REQUEST_STATUS.ACCEPTED,
+    $and: [
+      {
+        $or: [
+          { status: DATE_REQUEST_STATUS.ACCEPTED },
+          { status: DATE_REQUEST_STATUS.COMPLETED, dateTime: { $gte: completedVisibleAfter } },
+        ],
+      },
+    ],
     deleted: false,
   };
 
@@ -41,7 +53,7 @@ export default async ({ userId, page = 1, limit = 10 }) => {
   const [feedbacks, otherUsers, matches, blocks, unreadAggregation] = await Promise.all([
     DateFeedbackModel.find({ dateRequestRef: { $in: dateIds }, submittedBy: userId, deleted: false }).select('dateRequestRef'),
     UserModel.find({ _id: { $in: otherUserIds }, blocked: false, deleted: false }).select('firstName photos'),
-    MatchModel.find({ _id: { $in: matchIds } }).select('unmatchedOn deleted'),
+    MatchModel.find({ _id: { $in: matchIds } }).select('unmatchedOn deleted status'),
     BlockUserModel.find({ $or: [{ blockedBy: userId }, { userRef: userId }] }).select('blockedBy userRef'),
     MessageModel.aggregate([
       { $match: { to: new Types.ObjectId(userId), readAt: null } },
@@ -74,13 +86,23 @@ export default async ({ userId, page = 1, limit = 10 }) => {
     if (!otherUser) return null;
 
     const matchDoc = matchMap[date.matchRef?.toString()];
+    if (!matchDoc || matchDoc.deleted === true || matchDoc.status === MATCH_STATUS.UNMATCHED) {
+      return null;
+    }
     const unreadCount = unreadMap[otherUserId] || 0;
     const hasReported = loggedUser?.reportedUsers?.map(String).includes(otherUserId) || false;
     const hasBlocked = blockedSet.has(otherUserId);
-    const hasUnmatched = !!matchDoc?.unmatchedOn;
+    const hasUnmatched =
+      matchDoc.deleted === true
+      || matchDoc.status === MATCH_STATUS.UNMATCHED
+      || !!matchDoc.unmatchedOn;
 
     let isChatEnabled = false;
-    if (date.status === DATE_REQUEST_STATUS.ACCEPTED && !hasBlocked && !hasUnmatched) {
+    if (
+      [DATE_REQUEST_STATUS.ACCEPTED, DATE_REQUEST_STATUS.COMPLETED].includes(date.status)
+      && !hasBlocked
+      && !hasUnmatched
+    ) {
       const dateTime = new Date(date.dateTime);
       const start = new Date(dateTime);
       start.setHours(start.getHours() - 24);

@@ -2,7 +2,7 @@ import { UserModel } from '../index.js';
 import FilterModel from './schema.js';
 import { ResponseUtility, PropsValidationUtility } from '../../utility/index.js';
 import {
-  SUCCESS_CODE, POLITICAL_VIEWS, DRINKING_HABITS, SMOKING_HABITS, CHILDREN_STATUS, FAMILY_PLANS,
+  SUCCESS_CODE, POLITICAL_VIEWS, DRINKING_HABITS, SMOKING_HABITS, CHILDREN_STATUS, FAMILY_PLANS, CANNABIS,
   EDUCATION_LEVELS, EXERCISE_HABITS, RELATIONSHIP_TYPES, MIN_HEIGHT_CM, MAX_HEIGHT_CM, OPEN_TO_EVERYONE,
 } from '../../constants.js';
 
@@ -40,7 +40,7 @@ export default async ({ id, advancedFilters = {} }) => {
   const expandHeight = advancedFilters.expandHeight === true;
   const {
     politicalViews, drinkingHabits, smokingHabits, children, familyPlans,
-    education, exercise, relationshipType, languages,
+    education, exercise, relationshipType, languages, cannabis,
   } = advancedFilters;
 
   const validations = [
@@ -52,6 +52,7 @@ export default async ({ id, advancedFilters = {} }) => {
     { field: 'education', values: education, allowed: EDUCATION_LEVELS },
     { field: 'exercise', values: exercise, allowed: EXERCISE_HABITS },
     { field: 'relationshipType', values: relationshipType, allowed: RELATIONSHIP_TYPES },
+    { field: 'cannabis', values: cannabis, allowed: CANNABIS },
   ];
 
   validations.forEach((v) => {
@@ -108,6 +109,7 @@ export default async ({ id, advancedFilters = {} }) => {
     education: normalizeOpenFilter(education ?? oldAdv.education ?? []),
     exercise: normalizeOpenFilter(exercise ?? oldAdv.exercise ?? []),
     relationshipType: normalizeOpenFilter(relationshipType ?? oldAdv.relationshipType ?? []),
+    cannabis: normalizeOpenFilter(cannabis ?? oldAdv.cannabis ?? []),
     languages: languages ?? oldAdv.languages ?? [],
     expandHeight: expandHeight ?? oldAdv.expandHeight ?? false,
   };

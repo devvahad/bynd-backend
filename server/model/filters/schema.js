@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import {
   RELIGIONS, ALLOWED_GENDERS, USER_ETHNICITIES, LOOKING_FOR, POLITICAL_VIEWS,
   DRINKING_HABITS, SMOKING_HABITS, CHILDREN_STATUS, FAMILY_PLANS, EDUCATION_LEVELS,
-  EXERCISE_HABITS, RELATIONSHIP_TYPES, MIN_HEIGHT_CM, MAX_HEIGHT_CM, OPEN_TO_EVERYONE,
+  EXERCISE_HABITS, RELATIONSHIP_TYPES, MIN_HEIGHT_CM, MAX_HEIGHT_CM, OPEN_TO_EVERYONE, CANNABIS
 } from '../../constants.js';
 
 const { Schema, model } = mongoose;
@@ -13,7 +13,6 @@ const FilterSchema = new Schema(
       type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true,
     },
 
-    // Basic filters — available to all users.
     basicFilters: {
       distance: {
         type: Number, min: 0, max: 30, default: 30,
@@ -53,7 +52,7 @@ const FilterSchema = new Schema(
       education: { type: [String], enum: [...EDUCATION_LEVELS, OPEN_TO_EVERYONE], default: [] },
       exercise: { type: [String], enum: [...EXERCISE_HABITS, OPEN_TO_EVERYONE], default: [] },
       relationshipType: { type: [String], enum: [...RELATIONSHIP_TYPES, OPEN_TO_EVERYONE], default: [] },
-      // Free-text (not enum-locked) to match how the rest of the app stores languages.
+      cannabis: { type: [String], enum: [...CANNABIS, OPEN_TO_EVERYONE], default: [] },
       languages: { type: [String], default: [] },
       expandHeight: { type: Boolean, default: false },
     },

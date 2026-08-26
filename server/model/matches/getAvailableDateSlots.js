@@ -6,7 +6,7 @@ import { MATCH_STATUS, DATE_REQUEST_STATUS } from '../../constants.js';
 
 const MIN_HOURS_AHEAD = 12;
 const MAX_DAYS_AHEAD = 14;
-const MIN_SPACING_HOURS = 1;
+const MIN_SPACING_HOURS = 2;
 
 export default async ({ userId, selectedDate, matchedUserId }) => {
   if (!matchedUserId) {
@@ -50,11 +50,11 @@ export default async ({ userId, selectedDate, matchedUserId }) => {
     throw ResponseUtility.GENERIC_ERR({ code: 400, message: 'Selected date cannot be more than 14 days from now.' });
   }
 
-  const oneHourBefore = new Date(selectedDateTime.getTime() - MIN_SPACING_HOURS * 60 * 60 * 1000);
-  const oneHourAfter = new Date(selectedDateTime.getTime() + MIN_SPACING_HOURS * 60 * 60 * 1000);
+  const windowBefore = new Date(selectedDateTime.getTime() - MIN_SPACING_HOURS * 60 * 60 * 1000);
+  const windowAfter = new Date(selectedDateTime.getTime() + MIN_SPACING_HOURS * 60 * 60 * 1000);
 
   const conflictingDateRequest = await DateRequestModel.findOne({
-    dateTime: { $gte: oneHourBefore, $lte: oneHourAfter },
+    dateTime: { $gt: windowBefore, $lt: windowAfter },
     status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
     deleted: false,
     $or: [
@@ -64,17 +64,24 @@ export default async ({ userId, selectedDate, matchedUserId }) => {
   }).lean();
 
   if (conflictingDateRequest) {
+    const isOtherUserInvolved = conflictingDateRequest.senderRef.toString() === otherUserId.toString()
+      || conflictingDateRequest.receiverRef.toString() === otherUserId.toString();
+
+    const message = isOtherUserInvolved
+      ? 'The other user already has a date request with someone else around this time.'
+      : 'You already have a date request around this time.';
+
     throw ResponseUtility.GENERIC_ERR({
       code: 409,
       httpStatus: 409,
-      message: 'This time slot conflicts with an existing date request. Please select a time at least 1 hour apart.',
+      message
     });
   }
 
   const conflictingMatch = await MatchModel.findOne({
     status: MATCH_STATUS.DATE_PLANNED,
     deleted: false,
-    datePlanned: { $gte: oneHourBefore, $lte: oneHourAfter },
+    datePlanned: { $gt: windowBefore, $lt: windowAfter },
     $or: [
       { user1Ref: { $in: [userObjectId, otherUserObjectId] } },
       { user2Ref: { $in: [userObjectId, otherUserObjectId] } },
@@ -85,7 +92,7 @@ export default async ({ userId, selectedDate, matchedUserId }) => {
     throw ResponseUtility.GENERIC_ERR({
       code: 409,
       httpStatus: 409,
-      message: 'This time slot conflicts with an already planned date. Please select a time at least 1 hour apart.',
+      message: 'This time slot conflicts with an already planned date. Please select a time at least 2 hours apart.',
     });
   }
 

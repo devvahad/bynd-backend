@@ -13,6 +13,9 @@ import {
     ReportsController,
     ReviewReportController,
     AdminLogoutController,
+    AdminSendForgotPasswordEmailController,
+    AdminResetPasswordController,
+    NoShowUsersListController,
 } from '../controllers/admin.js';
 import { authenticate, authorizeAdmin } from '../controllers/authentication.js';
 import {
@@ -20,12 +23,15 @@ import {
     AdminUserDetailsSchema, AdminBlockUserSchema, AdminDeleteUserSchema,
     AdminGetVerificationDetailsSchema, AdminReviewVerificationSchema,
     AdminReportsSchema, AdminReviewReportSchema,
+    AdminSendForgotPasswordEmailSchema, AdminResetPasswordSchema, NoShowUsersListSchema,
 } from '../schemas/index.js';
 
 const router = Router();
 
 router.post('/login', AdminLoginSchema, AdminLoginController);
 router.post('/signup', AdminSignupSchema, AdminSignupController);
+router.post('/forgot-password', AdminSendForgotPasswordEmailSchema, AdminSendForgotPasswordEmailController);
+router.post('/reset-password', AdminResetPasswordSchema, AdminResetPasswordController);
 
 router.use(authenticate, authorizeAdmin);
 router.get('/dashboard', DashboardController);
@@ -39,5 +45,6 @@ router.post('/verification/details', AdminGetVerificationDetailsSchema, GetVerif
 router.post('/verification/review', AdminReviewVerificationSchema, ReviewVerificationController);
 router.post('/reports', AdminReportsSchema, ReportsController);
 router.post('/reports/review', AdminReviewReportSchema, ReviewReportController);
+router.post('/no-show-users', NoShowUsersListSchema, NoShowUsersListController);
 
 export default router;

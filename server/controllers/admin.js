@@ -3,6 +3,10 @@ import { AdminModel, UserModel, PromptModel } from '../model/index.js';
 import MatchModel from '../model/matches/schema.js';
 import SubscriptionModel from '../model/subscription/schema.js';
 import ReportModel from '../model/chat/reportSchema.js';
+import SendForgotPasswordEmailModel from '../model/admin/sendForgotPasswordEmail.js';
+import ResetPasswordModel from '../model/admin/resetPassword.js';
+import NoShowUsersListModel from '../model/admin/noShowUsersList.js';
+import DashboardModel from '../model/admin/dashboard.js';
 import {
   HashUtility,
   TokenUtility,
@@ -69,14 +73,10 @@ export const AdminSignupController = async (req, res) => {
 
 export const DashboardController = async (_req, res) => {
   try {
-    const [totalUsers, verifiedUsers, activeUsers] = await Promise.all([
-      UserModel.countDocuments({ deleted: false }),
-      UserModel.countDocuments({ deleted: false, verified: true }),
-      UserModel.countDocuments({ deleted: false, isActive: true }),
-    ]);
-    return res.json(ResponseUtility.SUCCESS({ data: { totalUsers, verifiedUsers, activeUsers } }));
+    const result = await DashboardModel();
+    return res.json(result);
   } catch (err) {
-    return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
+    return res.status(err.httpStatus || 500).json(err.success !== undefined ? err : ResponseUtility.GENERIC_ERR({ error: err.message }));
   }
 };
 
@@ -387,12 +387,14 @@ export const ReviewVerificationController = async (req, res) => {
 export const ReportsController = async (req, res) => {
   try {
     const {
-      page = 1, limit = 20, search = '', status = '', source = '',
+      page = 1, limit = 20, search = '', status = '', source = '', category = '', subOption = '',
     } = req.body;
 
     const matchQuery = { deleted: false };
     if (status) matchQuery.status = status;
     if (source) matchQuery.source = source;
+    if (category) matchQuery.category = category;
+    if (subOption) matchQuery.subOption = subOption;
 
     const pipeline = [
       { $match: matchQuery },
@@ -426,10 +428,10 @@ export const ReportsController = async (req, res) => {
           deleted: 1,
           createdOn: 1,
           reportedUser: {
-            _id: 1, firstName: 1, phoneNumber: 1, blocked: 1, deleted: 1, profilePicture: { $arrayElemAt: ['$reportedUser.photos.url', 0] },
+            _id: 1, firstName: 1, phoneNumber: 1, blocked: 1, deleted: 1, verifiedByAdmin: 1, profilePicture: { $arrayElemAt: ['$reportedUser.photos.url', 0] },
           },
           reporter: {
-            _id: 1, firstName: 1, phoneNumber: 1, deleted: 1, profilePicture: { $arrayElemAt: ['$reporter.photos.url', 0] },
+            _id: 1, firstName: 1, phoneNumber: 1, deleted: 1, verifiedByAdmin: 1, profilePicture: { $arrayElemAt: ['$reporter.photos.url', 0] },
           },
         },
       },
@@ -505,6 +507,33 @@ export const AdminLogoutController = async (req, res) => {
     return res.json(ResponseUtility.SUCCESS({ message: 'Admin logged out successfully.' }));
   } catch (err) {
     return res.status(500).json(ResponseUtility.GENERIC_ERR({ error: err.message }));
+  }
+};
+
+export const AdminSendForgotPasswordEmailController = async (req, res) => {
+  try {
+    const result = await SendForgotPasswordEmailModel(req.body);
+    return res.json(result);
+  } catch (err) {
+    return res.status(err.httpStatus || 500).json(err.success !== undefined ? err : ResponseUtility.GENERIC_ERR({ error: err.message }));
+  }
+};
+
+export const AdminResetPasswordController = async (req, res) => {
+  try {
+    const result = await ResetPasswordModel(req.body);
+    return res.json(result);
+  } catch (err) {
+    return res.status(err.httpStatus || 500).json(err.success !== undefined ? err : ResponseUtility.GENERIC_ERR({ error: err.message }));
+  }
+};
+
+export const NoShowUsersListController = async (req, res) => {
+  try {
+    const result = await NoShowUsersListModel(req.body);
+    return res.json(result);
+  } catch (err) {
+    return res.status(err.httpStatus || 500).json(err.success !== undefined ? err : ResponseUtility.GENERIC_ERR({ error: err.message }));
   }
 };
 

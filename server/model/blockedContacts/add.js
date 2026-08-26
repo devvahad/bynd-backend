@@ -6,9 +6,6 @@ import { DUPLICATE_KEY_ERROR_CODE, SUCCESS_CODE } from '../../constants.js';
 
 const normalizePhone = (phoneNumber) => phoneNumber.replace(/[\s\-()]/g, '');
 
-/**
- * Manually add a contact to the blocked list.
- */
 export default async ({ id, name, phoneNumber }) => {
   const { code, message } = PropsValidationUtility({
     validProps: ['id', 'name', 'phoneNumber'],

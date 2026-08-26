@@ -15,7 +15,6 @@ export default async () => {
     ]);
 
     for (const item of likes) {
-      // eslint-disable-next-line no-await-in-loop
       const user = await UserModel.findById(item._id);
       if (!user) continue;
 
@@ -23,7 +22,6 @@ export default async () => {
         continue;
       }
 
-      // eslint-disable-next-line no-await-in-loop
       await UnifiedNotificationService({
         userId: user._id,
         title: 'New Likes',
@@ -34,7 +32,6 @@ export default async () => {
       });
 
       user.lastBulkLikeNotificationSentAt = new Date();
-      // eslint-disable-next-line no-await-in-loop
       await user.save();
     }
 

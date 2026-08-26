@@ -45,6 +45,7 @@ export const AdvancedFiltersSchema = validate(
       education: stringArray,
       exercise: stringArray,
       relationshipType: stringArray,
+      cannabis: stringArray,
       languages: stringArray,
     }).optional(),
   }),
