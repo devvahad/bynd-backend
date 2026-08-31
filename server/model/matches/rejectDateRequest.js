@@ -63,8 +63,7 @@ export default async ({ userId, requestId, declineReason }) => {
       { $set: { deleted: true } },
     ),
   ]);
-
-  // No notification is sent for a plain decline — only surfaced via the pending-list disappearing.
+  
   UnifiedNotificationService({
     userId: request.senderRef,
     title: 'Date Request Declined',

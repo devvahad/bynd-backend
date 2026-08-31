@@ -4,9 +4,6 @@ import { BlockedContactModel, SyncedContactModel } from './schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 import { PAGINATION_LIMIT } from '../../constants.js';
 
-/**
- * Fetch the synced-contacts list, excluding any already-blocked numbers.
- */
 export default async ({ id, search = '', page = 1, limit = PAGINATION_LIMIT }) => {
   if (!id) {
     throw ResponseUtility.MISSING_PROPS({ message: 'Missing property id.' });

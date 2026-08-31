@@ -4,11 +4,9 @@ const { Schema, model } = mongoose;
 
 const PassSchema = new Schema(
   {
-    // user who is passing
     userRef: {
       type: Schema.Types.ObjectId, ref: 'User', required: true, index: true,
     },
-    // user who is being passed
     passedUserRef: {
       type: Schema.Types.ObjectId, ref: 'User', required: true, index: true,
     },

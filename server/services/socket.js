@@ -14,7 +14,6 @@ import { MATCH_STATUS, DATE_REQUEST_STATUS, TYPE_OF_NOTIFICATIONS } from '../con
 let io;
 const activeChats = new Map();
 
-/** Chat is disabled if either side has reported/removed the other. */
 const isChatDisabledBetweenUsers = async (userAId, userBId) => {
   const [userA, userB] = await Promise.all([
     UserModel.findById(userAId).select('reportedUsers reportedBy'),

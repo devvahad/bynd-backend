@@ -5,10 +5,6 @@ import { ResponseUtility } from '../../utility/index.js';
 
 const normalizePhone = (phoneNumber) => phoneNumber.replace(/[\s\-()]/g, '');
 
-/**
- * One-time sync of a user's phone contacts. Subsequent calls are rejected
- * once any contacts exist for the user.
- */
 export default async ({ id, contacts = [] }) => {
   if (!id) {
     throw ResponseUtility.MISSING_PROPS({ message: 'Missing property id.' });

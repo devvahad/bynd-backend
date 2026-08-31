@@ -32,7 +32,6 @@ const DateRequestSchema = new Schema(
     requestIdempotencyKey: { type: String, unique: true, required: true },
     responseMessage: { type: String, default: null },
     respondedAt: { type: Date, default: null },
-    // Counter-proposal fields.
     originalRequestRef: { type: Schema.Types.ObjectId, ref: 'DateRequest', default: null },
     isCounterProposal: { type: Boolean, default: false },
     remindersSent: { type: [String], default: [] },

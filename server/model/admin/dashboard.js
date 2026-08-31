@@ -149,7 +149,6 @@ export default async () => {
     $or: [{ cancelAutoRenewal: true }, { deleted: true }],
   });
 
-  // Revenue by transaction (each purchase counted once), not by current subscription state.
   const revenueAgg = await TransactionModel.aggregate([
     { $match: { deleted: false } },
     {

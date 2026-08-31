@@ -17,9 +17,6 @@ import {
   DUPLICATE_KEY_ERROR_CODE,
 } from '../../constants.js';
 
-/**
- * Like a user's profile. Detects mutual likes and creates a Match.
- */
 export default async ({ userId, likedUserId, likeIdempotencyKey }) => {
   const { code, message } = PropsValidationUtility({
     validProps: ['likedUserId'],
@@ -58,7 +55,6 @@ export default async ({ userId, likedUserId, likeIdempotencyKey }) => {
   }
 
   try {
-    // Undo a previous pass so premium users can "come back" to a profile they like.
     if (currentUser.isPremium) {
       const previousPass = await PassModel.findOne({ userRef: userId, passedUserRef: likedUserId, deleted: false });
       if (previousPass) {
@@ -66,7 +62,6 @@ export default async ({ userId, likedUserId, likeIdempotencyKey }) => {
       }
     }
 
-    // Enforce the daily like limit for free users.
     if (!currentUser.isPremium) {
       const likeCounterKey = `${LIKE_COUNTER_PREFIX}${userId}`;
       const likeCount = await RedisClient.get(likeCounterKey);
@@ -87,7 +82,6 @@ export default async ({ userId, likedUserId, likeIdempotencyKey }) => {
 
     const newLike = await LikeModel.create({ userRef: userId, likedUserRef: likedUserId, likeIdempotencyKey: idempotencyKey });
 
-    // Clean up any pending missed-match entry between these two users for premium likers.
     if (currentUser.isPremium) {
       const missedMatch = await MissedMatchModel.findOne({
         $or: [

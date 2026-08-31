@@ -9,9 +9,6 @@ import {
 } from '../../constants.js';
 import { logger } from '../../services/logger.js';
 
-/**
- * Recompute a user's inbound-likes-last-7-days count and derived segment.
- */
 export const updateInboundLikes = async (userId) => {
   try {
     const sevenDaysAgo = new Date();
@@ -43,10 +40,6 @@ export const updateInboundLikes = async (userId) => {
   }
 };
 
-/**
- * Decide whether the "you missed a match" popup should be shown, based on
- * session-swipe minimums, a daily cap, and a per-segment frequency.
- */
 export const shouldShowMissedMatchPopup = async (user) => {
   try {
     if ((user.sessionSwipeCount ?? 0) < MIN_SWIPES_BEFORE_POPUP) {
@@ -64,7 +57,7 @@ export const shouldShowMissedMatchPopup = async (user) => {
         dailyMissedMatchShown: 0,
         lastMissedMatchReset: new Date(),
       });
-      user.dailyMissedMatchShown = 0; // eslint-disable-line no-param-reassign
+      user.dailyMissedMatchShown = 0;
     }
 
     const segment = (user.userSegment || USER_SEGMENT.LOW).toUpperCase();
@@ -90,9 +83,6 @@ export const incrementSessionSwipes = async (userId) => {
   }
 };
 
-/**
- * Reset session swipe count. Intended to be called on app open/login.
- */
 export const resetSessionSwipes = async (userId) => {
   try {
     await UserModel.findByIdAndUpdate(userId, { sessionSwipeCount: 0 });
