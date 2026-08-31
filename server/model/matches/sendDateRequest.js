@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import DateRequestModel from './dateRequestSchema.js';
 import MatchModel from './schema.js';
 import { UserModel } from '../index.js';
-import { ResponseUtility, PropsValidationUtility } from '../../utility/index.js';
+import { ResponseUtility, PropsValidationUtility, TimeConversionUtility } from '../../utility/index.js';
 import { UnifiedNotificationService } from '../../services/index.js';
 import {
   SUCCESS_CODE, MATCH_STATUS, DATE_REQUEST_STATUS, FIRST_DATE_ACTIVITIES,
@@ -60,7 +60,7 @@ export default async ({
 
   const [sender, receiver] = await Promise.all([
     UserModel.findOne({ _id: userId, blocked: false, deleted: false }),
-    UserModel.findOne({ _id: receiverId, blocked: false, deleted: false }).select('firstName age photos deviceToken deviceType'),
+    UserModel.findOne({ _id: receiverId, blocked: false, deleted: false }).select('firstName age photos deviceToken deviceType timezone'),
   ]);
 
   if (!sender || !receiver) {
@@ -111,7 +111,8 @@ export default async ({
           },
           dateType,
           dateTime: savedRequest.dateTime,
-          weekday: savedRequest.dateTime.toLocaleString('en-US', { weekday: 'long' }),
+          // weekday: savedRequest.dateTime.toLocaleString('en-US', { weekday: 'long' }),
+          weekday: TimeConversionUtility.formatLongDateInTimezone(savedRequest.dateTime, receiver?.timezone || sender?.timezone).split(',')[0],
           location: location.name,
           status: DATE_REQUEST_STATUS.PENDING,
         },
@@ -181,7 +182,8 @@ export default async ({
         receiver: { id: receiver._id, name: receiver.firstName },
         dateType,
         dateTime: selectedDateTime,
-        weekday: selectedDateTime.toLocaleString('en-US', { weekday: 'long' }),
+        // weekday: selectedDateTime.toLocaleString('en-US', { weekday: 'long' }),
+        weekday: TimeConversionUtility.formatLongDateInTimezone(selectedDateTime, receiver?.timezone || sender?.timezone).split(',')[0],
         location: location.name,
         status: DATE_REQUEST_STATUS.PENDING,
       },

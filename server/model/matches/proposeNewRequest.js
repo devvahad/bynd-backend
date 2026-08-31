@@ -88,19 +88,18 @@ export default async ({
     }
   }
 
-  const oneHourBefore = new Date(selectedDateTime.getTime() - 60 * 60 * 1000);
-  const oneHourAfter = new Date(selectedDateTime.getTime() + 60 * 60 * 1000);
+  const twoHoursBefore = new Date(selectedDateTime.getTime() - 2 * 60 * 60 * 1000);
+  const twoHoursAfter = new Date(selectedDateTime.getTime() + 2 * 60 * 60 * 1000);
 
   const conflictCount = await DateRequestModel.countDocuments({
     $or: [{ senderRef: userId }, { receiverRef: userId }],
-    dateTime: { $gte: oneHourBefore, $lte: oneHourAfter },
+    dateTime: { $gt: twoHoursBefore, $lt: twoHoursAfter },
     status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
     deleted: false,
-    _id: { $ne: requestId },
   });
 
   if (conflictCount > 0) {
-    throw ResponseUtility.GENERIC_ERR({ code: 409, httpStatus: 409, message: 'This time conflicts with an existing date. Please choose a time at least 1 hour apart.' });
+    throw ResponseUtility.GENERIC_ERR({ code: 409, httpStatus: 409, message: 'This time conflicts with an existing date. Please choose a time at least 2 hours apart.' });
   }
 
   try {
@@ -147,7 +146,7 @@ export default async ({
       payload: {
         event: 'DATE_REQUEST_RESCHEDULED', matchId: match._id.toString(), dateRequestId: savedProposal._id.toString(),
       },
-    }).catch(() => {});
+    }).catch(() => { });
 
     return ResponseUtility.SUCCESS({
       message: 'Counter-proposal sent successfully.',
