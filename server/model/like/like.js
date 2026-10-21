@@ -174,7 +174,7 @@ export default async ({ userId, likedUserId, likeIdempotencyKey }) => {
     if (err.code === DUPLICATE_KEY_ERROR_CODE) {
       throw ResponseUtility.GENERIC_ERR({ code: 409, message: 'Duplicate like detected.', error: 'This like action has already been recorded.' });
     }
-    if (err.success !== undefined) throw err; // Already a ResponseUtility payload.
+    if (err.success !== undefined) throw err;
     throw ResponseUtility.GENERIC_ERR({ message: err.message, error: err.message });
   }
 };

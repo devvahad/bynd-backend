@@ -96,6 +96,7 @@ export default async ({
     dateTime: { $gt: twoHoursBefore, $lt: twoHoursAfter },
     status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
     deleted: false,
+    _id: { $ne: requestId }
   });
 
   if (conflictCount > 0) {

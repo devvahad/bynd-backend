@@ -266,7 +266,6 @@ export const BlockUserController = async (req, res) => {
     const user = await UserModel.findOneAndUpdate({ _id: userId }, { blocked: blockStatus }, { new: true });
     if (!user) return res.json(ResponseUtility.GENERIC_ERR({ message: 'User not found' }));
 
-    // Flag in Redis so an active session can be force-logged-out on its next request.
     await RedisClient.set(`user-status:${user._id}`, JSON.stringify({ blocked: blockStatus, forceLogout: blockStatus }));
 
     return res.json(ResponseUtility.SUCCESS({

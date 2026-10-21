@@ -42,7 +42,7 @@ export default async ({ id, profileUserId }) => {
 
   if (viewer.location?.coordinates && user.location?.coordinates) {
     const distanceMiles = DistanceUtility(viewer.location.coordinates, user.location.coordinates);
-    user.distance = distanceMiles ? `${distanceMiles} miles` : null;
+    user.distance = distanceMiles ? `${distanceMiles.toLocaleString('en-US')} miles` : null;
   } else {
     user.distance = null;
   }

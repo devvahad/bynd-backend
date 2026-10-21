@@ -13,17 +13,6 @@ export default {
   drinkSmoke: (req, res) => ModelResolver(req, res, UserModel.UsersDrinkSmokeService),
   uploadPhotos: (req, res) => ModelResolver(req, res, UserModel.UsersUploadPhotosService),
   firstDatePreferences: (req, res) => ModelResolver(req, res, UserModel.UsersFirstDatePreferencesService),
-  // verify: (req, res) => {
-  // 	const { query: { iphoneNumber, phoneToken } } = req;
-  // 	UserModel.UsersVerifyService({ id, emailToken })
-  // 		.then((sucess) => {
-  // 			res.set('Content-Type', 'text/html');
-  // 			res.send(sucess);
-  // 		})
-  // 		.catch(err => res.send(err));
-  // },
-  // resendVerification:
-  // (req, res) => ModelResolver(req, res, UserModel.UsersResendVerificationService),
   login: (req, res) => ModelResolver(req, res, UserModel.UsersLoginService),
   socialLogin: (req, res) => ModelResolver(req, res, UserModel.UsersSocialLoginService),
   details: (req, res) => ModelResolver(req, res, UserModel.UsersDetailsService),

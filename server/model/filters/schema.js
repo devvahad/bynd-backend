@@ -34,7 +34,6 @@ const FilterSchema = new Schema(
       expandAge: { type: Boolean, default: false },
     },
 
-    // Advanced filters — premium users only.
     advancedFilters: {
       heightRange: {
         min: {
@@ -56,7 +55,6 @@ const FilterSchema = new Schema(
       languages: { type: [String], default: [] },
       expandHeight: { type: Boolean, default: false },
     },
-
     isFilterActive: { type: Boolean, default: false },
     lastAppliedAt: { type: Date, default: Date.now },
   },

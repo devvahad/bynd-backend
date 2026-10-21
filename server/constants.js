@@ -490,14 +490,12 @@ export const APPLE_KEYS_URL =
 export const APPLE_ISSUER =
   'https://appleid.apple.com';
 
-// ---- Likes / Passes ----
 export const FREE_USER_LIKE_LIMIT = 10;
 export const PREMIUM_USER_LIKE_LIMIT = null;
 export const LIKE_COUNTER_PREFIX = 'like_counter:';
 export const LIKE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60;
 export const UNDO_PASS_REDIS_PREFIX = 'undo_pass:';
 
-// ---- Matches / Date Requests ----
 export const PLAN_DATE_EXPIRY_HOURS = 72;
 export const MATCH_STATUS = Object.freeze({
   ACTIVE: 'active',

@@ -4,7 +4,6 @@ export * from './admin.js';
 export * from './faq.js';
 export * from './notification.js';
 export * from './appDetail.js';
-// export * from './socialLogin.js';
 export * from './authentication.js';
 export { default as BlockedContactsControllers } from './blockedContacts.js';
 export { default as LikesControllers } from './likes.js';
