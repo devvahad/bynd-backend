@@ -26,7 +26,6 @@ const UserSchema = new Schema(
     phoneTokenRetries: { type: Number, default: 0 },
 
     verified: { type: Boolean, default: false },
-    // isVerified: { type: Boolean, default: false },
     verificationCode: { type: Number },
     verificationCodeExpiry: { type: Number },
     verificationTries: { type: Number, default: 0 },
@@ -131,6 +130,12 @@ const UserSchema = new Schema(
 
     photos: { type: [PhotoSchema], default: [] },
     photosSkipped: { type: Boolean, default: false },
+    photosStepCompleted: { type: Boolean, default: false },
+
+    skipPrompts: { type: Boolean, default: false },
+    promptsStepCompleted: { type: Boolean, default: false },
+
+    notificationPreferences: { type: Schema.Types.Mixed, default: {} },
 
     profileProgress: { type: Number, default: 0 },
     isPremium: { type: Boolean, default: false },
@@ -184,7 +189,6 @@ const UserSchema = new Schema(
     device: { type: String },
 
     deleted: { type: Boolean, default: false },
-    // isDeleted: { type: Boolean, default: false },
     blocked: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     tokenVersion: { type: Number, default: 0 },
@@ -193,6 +197,7 @@ const UserSchema = new Schema(
     updatedOn: { type: Date },
     deletedOn: { type: Date },
     deleteReason: { type: String, default: null },
+    metOnApp: { type: Boolean, default: null },
     lastUpdatedAt: { type: Date },
   },
   { timestamps: true },

@@ -560,3 +560,33 @@ export const REPORT_CATEGORIES = [
   },
   { category: "I'm just not interested in this person", subOptions: [] },
 ];
+
+export const DELETE_ACCOUNT_REASONS = [
+  'I met someone',
+  'Too many notifications',
+  'I need a break',
+  'I am dissatisfied with the app',
+  'Something else',
+];
+
+export const NOTIFICATION_CATEGORIES = Object.freeze({
+  NEW_MATCHES: 'newMatches',
+  NEW_DATE_REQUESTS: 'newDateRequests',
+  NEW_ADMIRERS: 'newAdmirers',
+  FIRST_DATE_REMINDERS: 'firstDateReminders',
+  EXPIRING_MATCHES: 'expiringMatches',
+  EXPIRING_DATE_REQUESTS: 'expiringDateRequests',
+  PROMOTIONS_AND_OFFERS: 'promotionsAndOffers',
+  DATE_CONFIRMATIONS: 'dateConfirmations',
+  DATE_CANCELLATIONS: 'dateCancellations',
+  DATE_RESCHEDULES: 'dateReschedules',
+  MESSAGES: 'messages',
+});
+
+export const NOTIFICATION_CHANNELS = Object.freeze({
+  PUSH: 'push',
+  EMAIL: 'email',
+  SMS: 'sms',
+});
+
+export const PROFILE_PROGRESS_STEP_WEIGHT = 4;

@@ -22,3 +22,14 @@ export const SubscriptionRestoreSchema = validate(
     packageName: Joi.string().trim().optional(),
   }),
 );
+
+export const SubscriptionCancelSchema = validate(Joi.object({}));
+
+export const SubscriptionTransactionHistorySchema = validate(
+  Joi.object({
+    page: Joi.number().integer().min(1).optional(),
+    limit: Joi.number().integer().min(1).max(100).optional(),
+  }),
+);
+
+export const SubscriptionGetPlansSchema = validate(Joi.object({}));

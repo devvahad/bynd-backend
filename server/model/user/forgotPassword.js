@@ -13,7 +13,6 @@ const ForgotPasswordModel = async ({ email }) => {
 
   const user = await UserModel.findOne({
     email: email.toLowerCase(),
-    // isDeleted: false,
     deleted: false,
   }).select('_id name firstName').lean();
 
