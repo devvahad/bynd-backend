@@ -490,14 +490,12 @@ export const APPLE_KEYS_URL =
 export const APPLE_ISSUER =
   'https://appleid.apple.com';
 
-// ---- Likes / Passes ----
 export const FREE_USER_LIKE_LIMIT = 10;
 export const PREMIUM_USER_LIKE_LIMIT = null;
 export const LIKE_COUNTER_PREFIX = 'like_counter:';
 export const LIKE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60;
 export const UNDO_PASS_REDIS_PREFIX = 'undo_pass:';
 
-// ---- Matches / Date Requests ----
 export const PLAN_DATE_EXPIRY_HOURS = 72;
 export const MATCH_STATUS = Object.freeze({
   ACTIVE: 'active',
@@ -562,3 +560,33 @@ export const REPORT_CATEGORIES = [
   },
   { category: "I'm just not interested in this person", subOptions: [] },
 ];
+
+export const DELETE_ACCOUNT_REASONS = [
+  'I met someone',
+  'Too many notifications',
+  'I need a break',
+  'I am dissatisfied with the app',
+  'Something else',
+];
+
+export const NOTIFICATION_CATEGORIES = Object.freeze({
+  NEW_MATCHES: 'newMatches',
+  NEW_DATE_REQUESTS: 'newDateRequests',
+  NEW_ADMIRERS: 'newAdmirers',
+  FIRST_DATE_REMINDERS: 'firstDateReminders',
+  EXPIRING_MATCHES: 'expiringMatches',
+  EXPIRING_DATE_REQUESTS: 'expiringDateRequests',
+  PROMOTIONS_AND_OFFERS: 'promotionsAndOffers',
+  DATE_CONFIRMATIONS: 'dateConfirmations',
+  DATE_CANCELLATIONS: 'dateCancellations',
+  DATE_RESCHEDULES: 'dateReschedules',
+  MESSAGES: 'messages',
+});
+
+export const NOTIFICATION_CHANNELS = Object.freeze({
+  PUSH: 'push',
+  EMAIL: 'email',
+  SMS: 'sms',
+});
+
+export const PROFILE_PROGRESS_STEP_WEIGHT = 4;

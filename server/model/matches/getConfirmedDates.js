@@ -8,14 +8,15 @@ import DateFeedbackModel from '../date/schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 import { DATE_REQUEST_STATUS, MATCH_STATUS } from '../../constants.js';
 
+const CHAT_WINDOW_HOURS = 24;
+const FEEDBACK_DELAY_HOURS = 3;
+const FEEDBACK_EXPIRY_DAYS = 7;
+
 export default async ({ userId, page = 1, limit = 10 }) => {
   const currentTime = new Date();
 
   const loggedUser = await UserModel.findById(userId).select('reportedUsers reportedBy');
 
-  const CHAT_WINDOW_HOURS = 24;
-  const FEEDBACK_DELAY_HOURS = 3;
-  const FEEDBACK_EXPIRY_DAYS = 7;
   const completedVisibleAfter = new Date(
     currentTime.getTime() - CHAT_WINDOW_HOURS * 60 * 60 * 1000
   );

@@ -2,7 +2,7 @@ import { logger } from '../../services/logger.js';
 import { randomUUID } from 'node:crypto';
 import UserModel from './index.js';
 import { ResponseUtility } from '../../utility/index.js';
-import { MAX_PHOTOS, MIN_PHOTOS, MAX_PHOTO_SIZE_BYTES } from '../../constants.js';
+import { MAX_PHOTOS, MIN_PHOTOS, MAX_PHOTO_SIZE_BYTES, PROFILE_PROGRESS_STEP_WEIGHT } from '../../constants.js';
 import ImageUploadUtility, { IMAGE_VARIANTS } from '../../utility/imageUpload.js';
 import S3Services from '../../services/s3.js';
 
@@ -189,12 +189,21 @@ export default async ({ id, photo, action = 'upload', photoUrl, photoOrder }) =>
             code: 'MIN_PHOTOS_REQUIRED',
           });
         }
+        const updatedUser = await UserModel.findOneAndUpdate(
+          { _id: id, photosStepCompleted: false },
+          { $inc: { profileProgress: PROFILE_PROGRESS_STEP_WEIGHT }, $set: { photosStepCompleted: true, lastUpdatedAt: new Date() } },
+          { new: true },
+        ).select('profileProgress');
+
         return ResponseUtility.SUCCESS({
           message: 'Photos validated successfully. You can proceed.',
-          data: { canProceed: true, totalPhotos: currentPhotos.length },
+          data: {
+            canProceed: true,
+            totalPhotos: currentPhotos.length,
+            profileProgress: updatedUser ? updatedUser.profileProgress : user.profileProgress,
+          },
         });
       }
-
       default:
         throw ResponseUtility.GENERIC_ERR({
           message: "Invalid action. Use 'upload', 'reorder', 'remove', 'get', or 'validate'.",

@@ -60,7 +60,6 @@ export const sendDateReminders = async () => {
           const formattedTime = formatTime(dateTime, user.timezone);
           const body = REMINDER_MESSAGES[reminderType](user.partnerName, formattedTime);
 
-          // eslint-disable-next-line no-await-in-loop
           await UnifiedNotificationService({
             userId: user.id,
             title: 'Date Reminder',
@@ -81,7 +80,6 @@ export const sendDateReminders = async () => {
         }
       }
 
-      // eslint-disable-next-line no-await-in-loop
       await DateRequestModel.updateOne({ _id: request._id }, { $addToSet: { remindersSent: reminderType } });
     }
 

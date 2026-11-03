@@ -134,3 +134,41 @@ export const DrinkSmokeSchema = validate(
     skipSmokingHabits: Joi.boolean().optional(),
   }),
 );
+
+export const DeleteAccountSchema = validate(
+  Joi.object({
+    reason: Joi.string().required(),
+    metOnApp: Joi.boolean().optional(),
+  }),
+);
+
+export const RemoveUserSchema = validate(
+  Joi.object({
+    removedUserId: Joi.string().hex().length(24).required(),
+  }),
+);
+
+export const ReportUserSchema = validate(
+  Joi.object({
+    reportedUserId: Joi.string().hex().length(24).required(),
+    category: Joi.string().required(),
+    subOption: Joi.string().optional().allow(''),
+  }),
+);
+
+export const UpdateEmailSchema = validate(
+  Joi.object({
+    email: Joi.string().email().required(),
+  }),
+);
+
+export const NotificationPreferencesSchema = validate(
+  Joi.object({
+    action: Joi.string()
+      .valid('GET', 'UPDATE', 'ENABLE_ALL', 'DISABLE_ALL', 'ENABLE_ALL_BY_CHANNEL', 'DISABLE_ALL_BY_CHANNEL')
+      .required(),
+    category: Joi.string().optional(),
+    channel: Joi.string().optional(),
+    enabled: Joi.boolean().optional(),
+  }),
+);

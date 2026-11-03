@@ -58,9 +58,9 @@ export default async () => {
   const userGrowthAgg = await UserModel.aggregate([
     {
       $facet: {
-        today: [{ $match: { createdOn: { $gte: today } } }, { $count: 'count' }],
-        week: [{ $match: { createdOn: { $gte: weekStart } } }, { $count: 'count' }],
-        month: [{ $match: { createdOn: { $gte: monthStart } } }, { $count: 'count' }],
+        today: [{ $match: { createdOn: { $gte: today }, verified: true } }, { $count: 'count' }],
+        week: [{ $match: { createdOn: { $gte: weekStart }, verified: true } }, { $count: 'count' }],
+        month: [{ $match: { createdOn: { $gte: monthStart }, verified: true } }, { $count: 'count' }],
       },
     },
   ]);
@@ -187,7 +187,9 @@ export default async () => {
   const totalRevenue = Object.values(revenueBreakdown).reduce((a, b) => a + b, 0);
 
   const premiumUsers = await UserModel.countDocuments({ isPremium: true, deleted: false, blocked: false });
-  const freeUsers = await UserModel.countDocuments({ isPremium: false, deleted: false, blocked: false });
+  const freeUsers = await UserModel.countDocuments({
+    isPremium: false, deleted: false, blocked: false, verified: true,
+  });
 
   return ResponseUtility.SUCCESS({
     data: {
