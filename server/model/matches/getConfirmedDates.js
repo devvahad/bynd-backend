@@ -8,12 +8,15 @@ import DateFeedbackModel from '../date/schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 import { DATE_REQUEST_STATUS, MATCH_STATUS } from '../../constants.js';
 
+const CHAT_WINDOW_HOURS = 24;
+const FEEDBACK_DELAY_HOURS = 3;
+const FEEDBACK_EXPIRY_DAYS = 7;
+
 export default async ({ userId, page = 1, limit = 10 }) => {
   const currentTime = new Date();
 
   const loggedUser = await UserModel.findById(userId).select('reportedUsers reportedBy');
 
-  const CHAT_WINDOW_HOURS = 24;
   const completedVisibleAfter = new Date(
     currentTime.getTime() - CHAT_WINDOW_HOURS * 60 * 60 * 1000
   );
@@ -142,6 +145,19 @@ export default async ({ userId, page = 1, limit = 10 }) => {
       hasBlocked,
       hasUnmatched,
       isChatEnabled,
+      feedback: (() => {
+        const dateStartTime = new Date(date.dateTime);
+        const feedbackEligibleAt = new Date(dateStartTime.getTime() + FEEDBACK_DELAY_HOURS * 60 * 60 * 1000);
+        const feedbackExpiresAt = new Date(dateStartTime.getTime() + FEEDBACK_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+        return {
+          canShow: date.status === DATE_REQUEST_STATUS.ACCEPTED
+            && currentTime >= feedbackEligibleAt
+            && currentTime <= feedbackExpiresAt
+            && !ratedSet.has(date._id.toString()),
+          eligibleAt: feedbackEligibleAt,
+          expiresAt: feedbackExpiresAt,
+        };
+      })(),
     };
   }).filter(Boolean);
 

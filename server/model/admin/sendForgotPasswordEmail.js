@@ -6,10 +6,6 @@ import { OTP_HASH_ITERATIONS } from '../../constants.js';
 const RESET_CODE_LENGTH = 6;
 const RESET_CODE_EXPIRY_HOURS = 1;
 
-/**
- * Send a password-reset code to an admin's email.
- * Always responds with success to avoid leaking which emails are registered admins.
- */
 export default async ({ email }) => {
   if (!email) {
     throw ResponseUtility.MISSING_PROPS({ message: 'Missing property email.' });

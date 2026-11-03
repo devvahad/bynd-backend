@@ -55,8 +55,6 @@ export default async ({
       name: location.name,
       address: location.address,
       placeId: location.placeId || null,
-      // Preserve existing coordinates when the edit doesn't supply new ones
-      // (the coordinates sub-field is required, so it must never be dropped).
       coordinates: location.coordinates
         ? { type: 'Point', coordinates: [location.coordinates.lng, location.coordinates.lat] }
         : request.location.coordinates,

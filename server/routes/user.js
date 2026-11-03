@@ -35,6 +35,11 @@ import {
   DatePreferencesSchema,
   ReligionPoliticalSchema,
   DrinkSmokeSchema,
+  DeleteAccountSchema,
+  RemoveUserSchema,
+  ReportUserSchema,
+  UpdateEmailSchema,
+  NotificationPreferencesSchema,
 } from '../schemas/index.js';
 
 const router = Router();
@@ -65,5 +70,12 @@ router.put('/me', UpdateUserSchema, UpdateUserResolver);
 router.put('/password', UpdatePasswordSchema, UpdatePasswordResolver);
 router.post('/contact', ContactAdminResolver);
 router.post('/picture', MultipartService, PictureResolver);
+
+router.post('/logout', UserControllers.logout);
+router.post('/delete', DeleteAccountSchema, UserControllers.deleteAccount);
+router.post('/remove', RemoveUserSchema, UserControllers.removeUser);
+router.post('/report', ReportUserSchema, UserControllers.report);
+router.put('/email', UpdateEmailSchema, UserControllers.updateEmail);
+router.post('/notification-preferences', NotificationPreferencesSchema, UserControllers.notificationPreferences);
 
 export default router;

@@ -4,9 +4,6 @@ import { BlockedContactModel } from './schema.js';
 import { ResponseUtility } from '../../utility/index.js';
 import { PAGINATION_LIMIT } from '../../constants.js';
 
-/**
- * Fetch this user's blocked contacts, paginated & searchable.
- */
 export default async ({ id, search = '', page = 1, limit = PAGINATION_LIMIT }) => {
   if (!id) {
     throw ResponseUtility.MISSING_PROPS({ message: 'Missing property id.' });

@@ -44,7 +44,6 @@ export default async ({
 
   const receiverPrimaryPhoto = otherUser.photos?.find((p) => p.order === 0)?.url || null;
 
-  // Best-effort parse of "123 Main St, New York, NY 10001, USA" -> city/state/zip.
   const addressParts = location.address.split(',').map((part) => part.trim());
   let city = null;
   let state = null;

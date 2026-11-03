@@ -33,13 +33,14 @@ export default async ({ userId, requestId }) => {
 
   const currentTime = new Date();
   const requestDateTime = new Date(request.dateTime);
+
   if (requestDateTime < currentTime) {
-    throw ResponseUtility.GENERIC_ERR({ code: 400, message: 'Cannot accept an expired date request.' });
+    throw ResponseUtility.GENERIC_ERR({ code: 400, message: 'This date request has expired. Please reschedule the date to continue.' });
   }
 
   const [sender, receiver] = await Promise.all([
     UserModel.findOne({ _id: request.senderRef, blocked: false, deleted: false }).select('firstName photos'),
-    UserModel.findOne({ _id: userId, blocked: false, deleted: false }).select('firstName photos'),
+    UserModel.findOne({ _id: userId, blocked: false, deleted: false }).select('firstName photos timezone'),
   ]);
 
   if (!sender || !receiver) {
@@ -74,7 +75,7 @@ export default async ({ userId, requestId }) => {
     payload: {
       event: 'DATE_REQUEST_ACCEPTED', matchId: updatedMatch._id.toString(), dateRequestId: updatedRequest._id.toString(),
     },
-  }).catch(() => {});
+  }).catch(() => { });
 
   const addressParts = request.location.address.split(',').map((part) => part.trim());
   let city = null;

@@ -81,9 +81,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(LogServices.RequestInterceptor);
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(LogServices.ResponseInterceptor);
-}
+app.use(LogServices.ResponseInterceptor);
 
 app.use(morgan(IS_PRODUCTION ? 'combined' : 'dev', {
   stream: { write: (msg) => LogServices.logger.info(msg.trim()) },

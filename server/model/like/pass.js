@@ -49,14 +49,12 @@ export default async ({ userId, passedUserId, passIdempotencyKey }) => {
       });
     }
 
-    // "Liked-by" list support: did the passed user already like us?
     const hadLikedMe = await LikeModel.findOne({ userRef: passedUserId, likedUserRef: userId, deleted: false });
 
     const existingPass = await PassModel.findOne({ userRef: userId, passedUserRef: passedUserId, deleted: false });
 
     if (existingPass) {
       if (hadLikedMe) {
-        // Re-passing removes the stale incoming like so this profile drops from the liked-by list.
         await LikeModel.findByIdAndUpdate(hadLikedMe._id, { deleted: true });
         return ResponseUtility.SUCCESS({
           data: {

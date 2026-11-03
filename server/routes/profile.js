@@ -3,6 +3,7 @@ import { Router } from 'express';
 import ProfileControllers from '../controllers/profile.js';
 import { authenticate } from '../controllers/authentication.js';
 import { MultipartService } from '../services/index.js';
+import { ListPromptsResolver, SkipPromptsResolver, CompletePromptsStepResolver } from '../controllers/resolvers/index.js';
 import {
   EditNameSchema,
   UpdateBioSchema,
@@ -62,6 +63,9 @@ router.delete('/photos', RemovePhotoSchema, ProfileControllers.removePhoto);
 router.put('/photos/reorder', ReorderPhotosSchema, ProfileControllers.reorderPhotos);
 
 router.post('/prompt', UpdatePromptSchema, ProfileControllers.updatePrompt);
+router.get('/prompts', ListPromptsResolver);
+router.post('/prompts/skip', SkipPromptsResolver);
+router.post('/prompts/complete', CompletePromptsStepResolver);
 
 router.put('/interests', UpdateInterestsSchema, ProfileControllers.updateInterests);
 router.put('/languages', UpdateLanguagesSchema, ProfileControllers.updateLanguages);

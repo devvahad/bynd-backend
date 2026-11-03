@@ -14,7 +14,6 @@ import { MATCH_STATUS, DATE_REQUEST_STATUS, TYPE_OF_NOTIFICATIONS } from '../con
 let io;
 const activeChats = new Map();
 
-/** Chat is disabled if either side has reported/removed the other. */
 const isChatDisabledBetweenUsers = async (userAId, userBId) => {
   const [userA, userB] = await Promise.all([
     UserModel.findById(userAId).select('reportedUsers reportedBy'),
@@ -169,14 +168,15 @@ export const StartSocket = async (server) => {
           socket.emit('chat-error', { message: 'Chat is no longer available.' });
           return;
         }
-        if (matchCheck.status !== MATCH_STATUS.DATE_PLANNED) {
+        if (![MATCH_STATUS.DATE_PLANNED, MATCH_STATUS.ACTIVE].includes(matchCheck.status)) {
           socket.emit('chat-error', { message: 'Chat is available only when a date is planned.' });
           return;
         }
 
         const dateRequest = await DateRequestModel.findOne({
-          matchRef: matchCheck._id, status: DATE_REQUEST_STATUS.ACCEPTED, deleted: false,
+          matchRef: matchCheck._id, status: { $in: [DATE_REQUEST_STATUS.ACCEPTED, DATE_REQUEST_STATUS.COMPLETED] }, deleted: false,
         });
+
         if (!dateRequest) {
           socket.emit('chat-error', { message: 'Chat is not available for this date.' });
           return;

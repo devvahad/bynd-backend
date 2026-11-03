@@ -19,10 +19,7 @@ export const expireMatchesJob = async () => {
     for (const match of matchesToExpire) {
       const { user1Ref, user2Ref } = match;
 
-      // eslint-disable-next-line no-await-in-loop
       await MatchModel.updateOne({ _id: match._id }, { $set: { status: MATCH_STATUS.EXPIRED } });
-
-      // eslint-disable-next-line no-await-in-loop
       await LikeModel.updateMany(
         {
           deleted: false,
@@ -34,7 +31,6 @@ export const expireMatchesJob = async () => {
         { $set: { deleted: true } },
       );
 
-      // eslint-disable-next-line no-await-in-loop
       await PassModel.updateMany(
         {
           deleted: false,

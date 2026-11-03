@@ -6,7 +6,7 @@ export const ResetPasswordModel = async ({ email, code, newPassword }) => {
     throw ResponseUtility.MISSING_PROPS();
   }
 
-  const user = await UserModel.findOne({ email: email.toLowerCase(), isDeleted: false }).select(
+  const user = await UserModel.findOne({ email: email.toLowerCase(), deleted: false }).select(
     '_id passwordResetCode passwordResetExpiry',
   );
 
