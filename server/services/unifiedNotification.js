@@ -15,6 +15,14 @@ const UnifiedNotificationService = async ({
 }) => {
   if (!userId || !title) return null;
 
+  if (reference) {
+    const alreadySent = await NotificationModel.findOne({ userId, type, reference }).select('_id').lean();
+    if (alreadySent) {
+      logger.info(`UnifiedNotificationService: skipped duplicate notification for user ${userId}, reference ${reference}`);
+      return null;
+    }
+  }
+
   const tasks = [];
 
   if (saveToDb) {

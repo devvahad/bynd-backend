@@ -92,11 +92,18 @@ export default async ({
   const twoHoursAfter = new Date(selectedDateTime.getTime() + 2 * 60 * 60 * 1000);
 
   const conflictCount = await DateRequestModel.countDocuments({
-    $or: [{ senderRef: userId }, { receiverRef: userId }],
     dateTime: { $gt: twoHoursBefore, $lt: twoHoursAfter },
     status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
     deleted: false,
-    _id: { $ne: requestId }
+    _id: { $ne: requestId },
+    $nor: [
+      { senderRef: userId, receiverRef: newReceiverId },
+      { senderRef: newReceiverId, receiverRef: userId },
+    ],
+    $or: [
+      { senderRef: { $in: [userId, newReceiverId] } },
+      { receiverRef: { $in: [userId, newReceiverId] } },
+    ],
   });
 
   if (conflictCount > 0) {
@@ -147,7 +154,7 @@ export default async ({
       payload: {
         event: 'DATE_REQUEST_RESCHEDULED', matchId: match._id.toString(), dateRequestId: savedProposal._id.toString(),
       },
-    }).catch(() => { });
+    }).catch(() => {});
 
     return ResponseUtility.SUCCESS({
       message: 'Counter-proposal sent successfully.',

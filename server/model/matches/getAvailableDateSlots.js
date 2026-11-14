@@ -57,6 +57,10 @@ export default async ({ userId, selectedDate, matchedUserId }) => {
     dateTime: { $gt: windowBefore, $lt: windowAfter },
     status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
     deleted: false,
+    $nor: [
+      { senderRef: userObjectId, receiverRef: otherUserObjectId },
+      { senderRef: otherUserObjectId, receiverRef: userObjectId },
+    ],
     $or: [
       { senderRef: { $in: [userObjectId, otherUserObjectId] } },
       { receiverRef: { $in: [userObjectId, otherUserObjectId] } },

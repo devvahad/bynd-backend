@@ -26,6 +26,7 @@ const UserSchema = new Schema(
     phoneTokenRetries: { type: Number, default: 0 },
 
     verified: { type: Boolean, default: false },
+    verifiedAt: { type: Date, default: null },
     verificationCode: { type: Number },
     verificationCodeExpiry: { type: Number },
     verificationTries: { type: Number, default: 0 },

@@ -54,9 +54,6 @@ export const initializeCronJobs = async () => {
     repeat: { pattern: '0 */12 * * *' },
     jobId: JOB_NAMES.BULK_ADMIRER_DIGEST,
   });
-
-  await cronQueue.add(JOB_NAMES.FREQUENT_MATCH_UPKEEP, {}, { jobId: `${JOB_NAMES.FREQUENT_MATCH_UPKEEP}-startup-${Date.now()}` });
-
   logger.info('Cron jobs initialized successfully.');
 };
 

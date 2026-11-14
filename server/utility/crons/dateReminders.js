@@ -47,8 +47,16 @@ export const sendDateReminders = async () => {
         }
       }
 
-      if (!reminderType || request.remindersSent?.includes(reminderType)) continue;
+      if (!reminderType) continue;
       if (!request.senderRef || !request.receiverRef) continue;
+
+      const previousState = await DateRequestModel.findByIdAndUpdate(
+        request._id,
+        { $addToSet: { remindersSent: reminderType } },
+        { new: false, lean: true },
+      );
+
+      if (previousState?.remindersSent?.includes(reminderType)) continue;
 
       const users = [
         { id: request.senderRef._id, partnerName: request.receiverRef.firstName, timezone: request.senderRef.timezone },
@@ -79,10 +87,7 @@ export const sendDateReminders = async () => {
           logger.error(`Failed to send ${reminderType} reminder to user ${user.id}: ${notifErr.message}`);
         }
       }
-
-      await DateRequestModel.updateOne({ _id: request._id }, { $addToSet: { remindersSent: reminderType } });
     }
-
     return { success: true, remindersSent };
   } catch (err) {
     logger.error(`Error in date reminder job: ${err.message}`);

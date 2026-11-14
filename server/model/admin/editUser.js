@@ -25,9 +25,12 @@ export default async ({ userRef, action }) => {
       throw ResponseUtility.GENERIC_ERR({ code: 400, message: 'Invalid action provided!' });
     }
 
+    const now = new Date();
+    const extraUpdate = action === ADMIN_USER_ACTIONS.VERIFIED ? { verifiedAt: now } : {};
+
     const user = await UserModel.findOneAndUpdate(
       { _id: userRef },
-      { $set: { ...config.update, updatedOn: new Date() } },
+      { $set: { ...config.update, ...extraUpdate, updatedOn: now } },
       { new: true, runValidators: true }
     );
 

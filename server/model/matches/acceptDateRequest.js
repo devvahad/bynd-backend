@@ -75,7 +75,7 @@ export default async ({ userId, requestId }) => {
     payload: {
       event: 'DATE_REQUEST_ACCEPTED', matchId: updatedMatch._id.toString(), dateRequestId: updatedRequest._id.toString(),
     },
-  }).catch(() => { });
+  }).catch(() => {});
 
   const addressParts = request.location.address.split(',').map((part) => part.trim());
   let city = null;

@@ -95,7 +95,7 @@ const SocialLoginModel = async ({
           name,
           email,
           verified: true,
-          isVerified: true,
+          verifiedAt: new Date(),
           ...providerQuery,
           deviceToken: sanitizedDeviceToken,
           deviceType: sanitizedDeviceType,
