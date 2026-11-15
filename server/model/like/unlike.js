@@ -44,6 +44,7 @@ export default async ({ userId, unlikedUserId }) => {
 
     if (match) {
       match.status = MATCH_STATUS.UNMATCHED;
+      match.deleted = true;
       match.unmatchedBy = userId;
       match.unmatchedOn = new Date();
       await match.save();

@@ -58,9 +58,9 @@ export default async () => {
   const userGrowthAgg = await UserModel.aggregate([
     {
       $facet: {
-        today: [{ $match: { createdOn: { $gte: today }, verified: true } }, { $count: 'count' }],
-        week: [{ $match: { createdOn: { $gte: weekStart }, verified: true } }, { $count: 'count' }],
-        month: [{ $match: { createdOn: { $gte: monthStart }, verified: true } }, { $count: 'count' }],
+        today: [{ $match: { verifiedAt: { $gte: today }, deleted: false, blocked: false } }, { $count: 'count' }],
+        week: [{ $match: { verifiedAt: { $gte: weekStart }, deleted: false, blocked: false } }, { $count: 'count' }],
+        month: [{ $match: { verifiedAt: { $gte: monthStart }, deleted: false, blocked: false } }, { $count: 'count' }],
       },
     },
   ]);
@@ -146,7 +146,8 @@ export default async () => {
   });
 
   const subscriptionCancellations = await SubscriptionModel.countDocuments({
-    $or: [{ cancelAutoRenewal: true }, { deleted: true }],
+    deleted: false,
+    cancelAutoRenewal: true,
   });
 
   const revenueAgg = await TransactionModel.aggregate([

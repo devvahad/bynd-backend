@@ -134,10 +134,17 @@ export default async ({
     const oneHourAfter = new Date(selectedDateTime.getTime() + 60 * 60 * 1000);
 
     const conflictCount = await DateRequestModel.countDocuments({
-      $or: [{ senderRef: userId }, { receiverRef: userId }],
       dateTime: { $gte: oneHourBefore, $lte: oneHourAfter },
       status: { $in: [DATE_REQUEST_STATUS.PENDING, DATE_REQUEST_STATUS.ACCEPTED] },
       deleted: false,
+      $nor: [
+        { senderRef: userId, receiverRef: receiverId },
+        { senderRef: receiverId, receiverRef: userId },
+      ],
+      $or: [
+        { senderRef: { $in: [userId, receiverId] } },
+        { receiverRef: { $in: [userId, receiverId] } },
+      ],
     });
 
     if (conflictCount > 0) {
