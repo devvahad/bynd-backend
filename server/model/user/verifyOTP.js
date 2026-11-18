@@ -58,6 +58,7 @@ const verifyOtp = async ({ userId, otp, device = '', fcmToken = '' }) => {
     {
       $set: {
         verified: true,
+        verifiedAt: now,
         phoneToken: null,
         phoneTokenDate: null,
         phoneTokenExpiry: null,

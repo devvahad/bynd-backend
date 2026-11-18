@@ -42,7 +42,7 @@ export default async ({ userId, requestId }) => {
         ],
         deleted: false,
       },
-      { $set: { status: MATCH_STATUS.UNMATCHED, unmatchedBy: userId, unmatchedOn: now } },
+      { $set: { status: MATCH_STATUS.UNMATCHED, deleted: true, unmatchedBy: userId, unmatchedOn: now } },
     ),
     LikeModel.updateMany(
       {

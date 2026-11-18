@@ -26,24 +26,5 @@ export default {
   removeUser: (req, res) => ModelResolver(req, res, UserModel.UsersRemoveService),
   report: (req, res) => ModelResolver(req, res, UserModel.UsersReportService),
   updateEmail: (req, res) => ModelResolver(req, res, UserModel.UsersUpdateEmailService),
-  notificationPreferences: (req, res) => ModelResolver(req, res, UserModel.UsersNotificationPreferencesService),
-  password: (req, res) => {
-    const { query: { id, tok } } = req;
-    UserModel.UsersPasswordService({ id, tok })
-      .then((success) => {
-        res.set('Content-Type', 'text/html');
-        res.send(success.data);
-      })
-      .catch(err => res.send(err));
-  },
-  forgotPassword: (req, res) => {
-    const { body: { id, passToken, password } } = req;
-    UserModel.UsersForgotPasswordService({ id, passToken, password })
-      .then((success) => {
-        res.set('Content-Type', 'text/html');
-        res.send(success.data);
-      })
-      .catch(err => res.send(err));
-  },
-  contactAdmin: (req, res) => ModelResolver(req, res, UserModel.UsersContactAdminService),
+  notificationPreferences: (req, res) => ModelResolver(req, res, UserModel.UsersNotificationPreferencesService)
 };
