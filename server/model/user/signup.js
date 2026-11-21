@@ -7,7 +7,16 @@ import {
   HashUtility,
 } from '../../utility/index.js';
 import { AwsSNSService } from '../../services/index.js';
-import { SUCCESS_CODE, OTP_VALIDITY_MINUTES, OTP_LENGTH, OTP_HASH_ITERATIONS, DUPLICATE_KEY_ERROR_CODE } from '../../constants.js';
+import {
+  SUCCESS_CODE,
+  OTP_VALIDITY_MINUTES,
+  OTP_LENGTH,
+  OTP_HASH_ITERATIONS,
+  DUPLICATE_KEY_ERROR_CODE,
+  APPLE_REVIEW_PHONE,
+  APPLE_REVIEW_PHONE_CODE,
+  APPLE_REVIEW_OTP,
+} from '../../constants.js';
 
 export default async ({ phoneNumber, phoneCode, device = '' }) => {
   try {
@@ -34,7 +43,8 @@ export default async ({ phoneNumber, phoneCode, device = '' }) => {
       throw ResponseUtility.GENERIC_ERR({ message: 'Phone number is already registered.' });
     }
 
-    const otp = RandomCodeUtility(OTP_LENGTH).toString();
+    const isReviewerUser = normalizedPhoneNumber === APPLE_REVIEW_PHONE && normalizedPhoneCode === APPLE_REVIEW_PHONE_CODE;
+    const otp = isReviewerUser ? APPLE_REVIEW_OTP : RandomCodeUtility(OTP_LENGTH).toString();
     const hashedOtp = await HashUtility.generate({ text: otp, iterations: OTP_HASH_ITERATIONS });
 
     const now = new Date();
@@ -62,15 +72,17 @@ export default async ({ phoneNumber, phoneCode, device = '' }) => {
 
     const fullPhoneNumber = `${normalizedPhoneCode}${normalizedPhoneNumber}`;
 
-    let snsResult;
-    try {
-      snsResult = await AwsSNSService.sendOTP({ phoneNumber: fullPhoneNumber, otp });
-    } catch {
-      snsResult = { success: false };
+    let snsResult = { success: true };
+    if (!isReviewerUser) {
+      try {
+        snsResult = await AwsSNSService.sendOTP({ phoneNumber: fullPhoneNumber, otp });
+      } catch {
+        snsResult = { success: false };
+      }
     }
 
     if (!snsResult?.success) {
-      await UserModel.deleteOne({ _id: userObject._id }).catch(() => {});
+      await UserModel.deleteOne({ _id: userObject._id }).catch(() => { });
       throw ResponseUtility.GENERIC_ERR({ message: 'Unable to send code, try again.' });
     }
 

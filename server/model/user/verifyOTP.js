@@ -5,7 +5,14 @@ import {
   TokenUtility,
   HashUtility,
 } from '../../utility/index.js';
-import { SUCCESS_CODE, MAX_OTP_RETRIES, tokenLife } from '../../constants.js';
+import {
+  SUCCESS_CODE,
+  MAX_OTP_RETRIES,
+  tokenLife,
+  APPLE_REVIEW_PHONE,
+  APPLE_REVIEW_PHONE_CODE,
+  APPLE_REVIEW_OTP,
+} from '../../constants.js';
 import UserDetailsModel from './details.js';
 
 const verifyOtp = async ({ userId, otp, device = '', fcmToken = '' }) => {
@@ -40,7 +47,10 @@ const verifyOtp = async ({ userId, otp, device = '', fcmToken = '' }) => {
     throw ResponseUtility.GENERIC_ERR({ message: 'Maximum OTP attempts exceeded. Please request a new one.' });
   }
 
-  const isOtpValid = await HashUtility.compare({ hash: user.phoneToken, text: String(otp) });
+  const isReviewerUser = user.phoneNumber === APPLE_REVIEW_PHONE && user.phoneCode === APPLE_REVIEW_PHONE_CODE;
+  const isOtpValid = isReviewerUser && String(otp) === APPLE_REVIEW_OTP
+    ? true
+    : await HashUtility.compare({ hash: user.phoneToken, text: String(otp) });
 
   if (!isOtpValid) {
     await UserModel.updateOne(
