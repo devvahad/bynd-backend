@@ -127,10 +127,17 @@ export default async () => {
   const weeklyReports = await ReportModel.countDocuments({ createdOn: { $gte: weekStart } });
 
   const reportedUserIds = await ReportModel.distinct('reportedUserId', { deleted: false });
-  const noShowUserIds = await DateFeedbackModel.distinct('otherUserRef', { deleted: false, noShowReported: true });
+  const noShowProfiles = await DateFeedbackModel.aggregate([
+    { $match: { deleted: false, noShowReported: true } },
+    { $group: { _id: '$otherUserRef' } },
+    { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+    { $unwind: '$user' },
+    { $match: { 'user.deleted': false } },
+    { $count: 'count' },
+  ]);
 
   const flaggedUsers = reportedUserIds.length;
-  const noShowReportedProfiles = noShowUserIds.length;
+  const noShowReportedProfiles = noShowProfiles[0]?.count || 0;
 
   const topFilters = await UserModel.aggregate([
     { $unwind: '$firstDatePreferences' },

@@ -221,6 +221,10 @@ export const OTP_LENGTH = 5;
 export const OTP_HASH_ITERATIONS = 10;
 export const MAX_OTP_RETRIES = 5;
 
+export const APPLE_REVIEW_PHONE = '4085550101';
+export const APPLE_REVIEW_PHONE_CODE = '+1';
+export const APPLE_REVIEW_OTP = '12345';
+
 export const MAX_LOG_SIZE_BYTES = 50 * 1024 * 1024;
 export const MAX_LOG_FILES = 10;
 
